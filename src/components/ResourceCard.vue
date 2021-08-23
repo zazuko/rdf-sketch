@@ -1,5 +1,5 @@
 <template>
-  <div class="resource-card" :class="{ active: isActive }" :data-id="resource.id">
+  <div class="resource-card" :class="{ active: isActive }">
     <header
       class="resource-card-header"
       @mouseenter="$emit('hover-title', resource)"
@@ -18,7 +18,7 @@
       <tr
         v-for="(property, index) in resource.properties"
         :key="index"
-        :data-id="resource.id + property.id"
+        :data-id="property.id"
         :class="{ active: isPropertyActive(property) }"
         @mouseenter="$emit('hover-property', resource, property)"
         @mouseleave="$emit('unhover-property', resource, property)"
@@ -77,7 +77,7 @@ export default defineComponent({
 
 <style scoped>
 .resource-card {
-  @apply absolute border rounded shadow-md bg-white text-gray-900 opacity-90 text-sm;
+  @apply border rounded shadow-md bg-white text-gray-900 opacity-90 text-sm;
 }
 
 .resource-card-header {

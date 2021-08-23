@@ -25,8 +25,8 @@
 <script>
 import TermSet from '@rdfjs/term-set'
 import { computed, defineComponent, ref, toRefs } from 'vue'
+import GraphLayout from '@zazuko/spex/src/components/GraphLayout.vue'
 
-import GraphLayout from './GraphLayout.vue'
 import ResourceCard from './ResourceCard.vue'
 
 export default defineComponent({

@@ -12,6 +12,7 @@
     "@rdfjs/dataset": "^1.1.1",
     "@rdfjs/term-set": "^1.1.0",
     "@zazuko/rdf-vocabularies": "^2021.6.10",
+    "@zazuko/spex": "^0.1.8",
     "buffer": "^5.7.1",
     "core-js": "^3.8.3",
     "d3": "^7.0.1",
