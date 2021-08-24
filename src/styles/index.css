@@ -2,5 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'https://fonts.googleapis.com/css?family=Playfair+Display:400,700';
 @import './variables.css';
-@import './splitpanes.css'
+@import './splitpanes.css';
+
+@layer base {
+  input[type="text"] {
+    @apply border px-1 w-auto;
+  }
+}

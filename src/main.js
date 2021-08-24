@@ -3,4 +3,12 @@ import App from './App.vue'
 import './styles/index.css'
 import './registerServiceWorker'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+
+app.directive('focus', {
+  mounted (el) {
+    el.focus()
+  },
+})
+
+app.mount('#app')

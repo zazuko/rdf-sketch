@@ -18,6 +18,8 @@
     "core-js": "^3.8.3",
     "d3": "^7.0.1",
     "dagre": "^0.8.5",
+    "lodash.debounce": "^4.0.8",
+    "nanoid": "^3.1.25",
     "process": "^0.11.10",
     "register-service-worker": "^1.7.2",
     "splitpanes": "^3.0.6",

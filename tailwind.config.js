@@ -18,6 +18,9 @@ module.exports = {
           900: 'var(--color-primary-900)',
         },
       },
+      fontFamily: {
+        title: ['Playfair Display', 'serif'],
+      },
     },
   },
   variants: {
