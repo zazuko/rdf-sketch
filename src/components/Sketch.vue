@@ -162,7 +162,7 @@ export default defineComponent({
 
 function useTabs () {
   // TODO: Validate stored state?
-  const { value: tabs, save: syncTabs } = useLocalStorage('tabs')
+  const { value: tabs, save: syncTabs } = useLocalStorage('tabs', [])
   const { value: selectedTabId, save: syncSelectedTab } = useLocalStorage('selectedTabId')
 
   const justSaved = ref(false)
