@@ -2,12 +2,12 @@ import { createApp } from 'vue'
 import GraphView from './components/GraphView.vue'
 import './styles/graph-view.css'
 
-import * as rdf from '@rdfjs/dataset'
 import N3Parser from '@rdfjs/parser-n3'
 import stringToStream from 'string-to-stream'
 import getStream from 'get-stream'
 import { shrink } from '@zazuko/rdf-vocabularies/shrink'
 
+import rdf from '../rdf'
 export { default as GraphView } from './components/GraphView.vue'
 
 export function render (selector, props) {

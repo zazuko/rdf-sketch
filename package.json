@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "@rdfjs-elements/rdf-editor": "^0.5.2",
-    "@rdfjs/dataset": "^1.1.1",
-    "@rdfjs/term-set": "^1.1.0",
+    "@rdfjs/environment": "^0.1.1",
     "@zazuko/rdf-vocabularies": "^2021.9.22-3",
     "@zazuko/spex": "^0.1.8",
     "buffer": "^6.0.3",

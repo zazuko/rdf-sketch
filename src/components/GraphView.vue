@@ -23,10 +23,10 @@
 </template>
 
 <script>
-import TermSet from '@rdfjs/term-set'
 import { computed, defineComponent, ref, toRefs } from 'vue'
 import GraphLayout from '@zazuko/spex/src/components/GraphLayout.vue'
 
+import rdf from '../rdf'
 import ResourceCard from './ResourceCard.vue'
 
 export default defineComponent({
@@ -74,7 +74,7 @@ export default defineComponent({
 })
 
 function resourcesFromDataset (dataset, env) {
-  const subjects = new TermSet([...dataset].map(({ subject }) => subject))
+  const subjects = rdf.termSet([...dataset].map(({ subject }) => subject))
 
   return [...subjects].map(subject => {
     const quads = dataset.match(subject)
@@ -84,7 +84,7 @@ function resourcesFromDataset (dataset, env) {
           id: predicate.value,
           term: predicate,
           name: env.shrink(predicate.value),
-          values: new TermSet(),
+          values: rdf.termSet(),
         }
         acc.set(predicate.value, property)
       }
@@ -104,7 +104,7 @@ function resourcesFromDataset (dataset, env) {
 }
 
 function linksFromResources (resources) {
-  const resourceIds = new TermSet(resources.map(({ term }) => term))
+  const resourceIds = rdf.termSet(resources.map(({ term }) => term))
 
   return resources
     .flatMap(resource => resource.properties.map((property) => ({ ...property, resource })))

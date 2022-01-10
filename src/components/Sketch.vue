@@ -104,7 +104,6 @@
 </template>
 
 <script>
-import rdf from '@rdfjs/dataset'
 import { shrink } from '@zazuko/rdf-vocabularies/shrink'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
@@ -118,6 +117,7 @@ import debounce from 'lodash.debounce'
 
 import GraphView from './GraphView.vue'
 import { useLocalStorage } from '../useLocalStorage'
+import rdf from '../rdf'
 
 const formats = [...parsers.keys()]
 
