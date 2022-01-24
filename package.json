@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@rdfjs-elements/rdf-editor": "^0.5.2",
-    "@rdfjs/environment": "^0.1.1",
     "@zazuko/rdf-vocabularies": "^2021.9.22-3",
     "@zazuko/spex": "^0.1.8",
     "buffer": "^6.0.3",
@@ -20,6 +19,7 @@
     "lodash.debounce": "^4.0.8",
     "nanoid": "^3.1.25",
     "process": "^0.11.10",
+    "rdf-ext": "^2.0.0",
     "register-service-worker": "^1.7.2",
     "splitpanes": "^3.0.6",
     "stream-browserify": "^3.0.0",

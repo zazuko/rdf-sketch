@@ -3,11 +3,11 @@ import GraphView from './components/GraphView.vue'
 import './styles/graph-view.css'
 
 import N3Parser from '@rdfjs/parser-n3'
+import { shrink } from '@zazuko/rdf-vocabularies/shrink'
 import stringToStream from 'string-to-stream'
 import getStream from 'get-stream'
-import { shrink } from '@zazuko/rdf-vocabularies/shrink'
+import rdf from 'rdf-ext'
 
-import rdf from '../rdf'
 export { default as GraphView } from './components/GraphView.vue'
 
 export function render (selector, props) {

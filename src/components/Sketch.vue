@@ -114,10 +114,10 @@ import { PlusSmIcon } from '@heroicons/vue/solid'
 import { XCircleIcon } from '@heroicons/vue/outline'
 import { nanoid } from 'nanoid'
 import debounce from 'lodash.debounce'
+import rdf from 'rdf-ext'
 
 import GraphView from './GraphView.vue'
 import { useLocalStorage } from '../useLocalStorage'
-import rdf from '../rdf'
 
 const formats = [...parsers.keys()]
 
