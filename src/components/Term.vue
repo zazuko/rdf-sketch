@@ -33,7 +33,7 @@ function termValue (env, term) {
   }
 
   if (term.termType === 'NamedNode') {
-    return env.shrink(term.value)
+    return env.shrink(term)
   }
 
   return term.value
@@ -41,7 +41,7 @@ function termValue (env, term) {
 
 function expandValue (env, term) {
   if (term.termType === 'Literal') {
-    const datatype = term.datatype ? `^^${env.shrink(term.datatype.value)}` : ''
+    const datatype = term.datatype ? `^^${env.shrink(term.datatype)}` : ''
     const language = term.language ? `@${term.language}` : ''
 
     return `${term.value}${datatype}${language}`

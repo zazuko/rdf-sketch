@@ -75,6 +75,7 @@
           parseDelay="1000"
           @parsing-failed="onParsingFailed"
           @quads-changed="onQuadsChanged"
+          @prefixes-parsed="onPrefixesParsed"
         />
         <div v-if="parseError" class="px-4 py-2 bg-red-500 text-white">
           {{ parseError }}
@@ -104,7 +105,7 @@
 </template>
 
 <script>
-import { shrink } from '@zazuko/rdf-vocabularies/shrink'
+import prefixes from '@zazuko/rdf-vocabularies/prefixes'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import '@rdfjs-elements/rdf-editor'
@@ -126,8 +127,27 @@ export default defineComponent({
   components: { PlusSmIcon, GraphView, Splitpanes, Pane, XCircleIcon },
 
   setup () {
+    const editorPrefixes = ref({})
+    const env = computed(() => ({
+      shrink (term) {
+        const factory = rdf.clone()
+
+        for (const [prefix, uri] of Object.entries(prefixes)) {
+          factory.prefixes.set(prefix, factory.namedNode(uri))
+        }
+
+        for (const [prefix, uri] of Object.entries(editorPrefixes.value)) {
+          factory.prefixes.set(prefix, factory.namedNode(uri))
+        }
+
+        return factory.prefixes.shrink(term) || term.value
+      },
+    }))
+
     return {
       ...useTabs(),
+      editorPrefixes,
+      env,
     }
   },
 
@@ -137,11 +157,6 @@ export default defineComponent({
       dataset: rdf.dataset(),
       parseError: null,
       activeLinks: [],
-      env: {
-        shrink (uri) {
-          return shrink(uri) || uri
-        },
-      },
     }
   },
 
@@ -164,6 +179,11 @@ export default defineComponent({
     onQuadsChanged (e) {
       this.parseError = null
       this.loadResources()
+    },
+
+    onPrefixesParsed (e) {
+      const prefixes = e.detail.prefixes
+      this.editorPrefixes = prefixes
     },
 
     async loadResources () {

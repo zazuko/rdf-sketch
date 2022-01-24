@@ -83,7 +83,7 @@ function resourcesFromDataset (dataset, env) {
         const property = {
           id: predicate.value,
           term: predicate,
-          name: env.shrink(predicate.value),
+          name: env.shrink(predicate),
           values: rdf.termSet(),
         }
         acc.set(predicate.value, property)
@@ -97,7 +97,7 @@ function resourcesFromDataset (dataset, env) {
     return {
       id: subject.value,
       term: subject,
-      name: env.shrink(subject.value),
+      name: env.shrink(subject),
       properties: [...properties.values()],
     }
   })
