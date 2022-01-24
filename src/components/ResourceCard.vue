@@ -29,7 +29,7 @@
           </TermTooltip>
         </th>
         <td class="property-row">
-          <div v-for="value in property.values" :key="value.id">
+          <div v-for="value in property.values" :key="value.value">
             <Term :term="value" :env="env" />
           </div>
         </td>
