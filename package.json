@@ -1,5 +1,5 @@
 {
-  "name": "rdf-sketch",
+  "name": "@zazuko/rdf-sketch",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,6 +8,9 @@
     "lint": "vue-cli-service lint",
     "deploy": "./scripts/deploy.sh"
   },
+  "files": [
+    "/src"
+  ],
   "dependencies": {
     "@rdfjs-elements/rdf-editor": "^0.5.2",
     "@zazuko/rdf-vocabularies": "^2021.9.22-3",
