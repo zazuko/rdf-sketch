@@ -1,13 +1,14 @@
 {
   "name": "@zazuko/rdf-sketch",
   "version": "0.1.0",
-  "private": true,
+  "author": "Zazuko (https://zazuko.com)",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "deploy": "./scripts/deploy.sh"
   },
+  "main": "src/main.js",
   "files": [
     "/src"
   ],
@@ -46,5 +47,9 @@
     "postcss": "^8.3.6",
     "tailwindcss": "^3.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zazuko/rdf-sketch.git"
+  }
 }
