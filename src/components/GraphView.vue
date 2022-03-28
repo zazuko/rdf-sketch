@@ -24,7 +24,7 @@
 
 <script>
 import { computed, defineComponent, ref, toRefs } from 'vue'
-import GraphLayout from '@zazuko/spex/src/components/GraphLayout.vue'
+import { GraphLayout } from '@zazuko/vue-graph-layout'
 import rdf from 'rdf-ext'
 
 import ResourceCard from './ResourceCard.vue'

@@ -13,9 +13,10 @@
     "/src"
   ],
   "dependencies": {
+    "@heroicons/vue": "^1.0.6",
     "@rdfjs-elements/rdf-editor": "^0.5.2",
     "@zazuko/rdf-vocabularies": "^2021.9.22-3",
-    "@zazuko/spex": "^0.1.8",
+    "@zazuko/vue-graph-layout": "^0.1.0",
     "buffer": "^6.0.3",
     "core-js": "^3.8.3",
     "d3": "^7.0.1",
