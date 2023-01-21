@@ -4,7 +4,7 @@
   </TermTooltip>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue'
 
 import TermTooltip from './TermTooltip.vue'
@@ -15,7 +15,7 @@ export default defineComponent({
 
   components: { TermTooltip },
 
-  data () {
+  data() {
     const displayValue = termValue(this.env, this.term)
     const expandedValue = expandValue(this.env, this.term)
 
@@ -27,7 +27,7 @@ export default defineComponent({
   }
 })
 
-function termValue (env, term) {
+function termValue(env, term) {
   if (!term) {
     return term
   }
@@ -39,7 +39,7 @@ function termValue (env, term) {
   return term.value
 }
 
-function expandValue (env, term) {
+function expandValue(env, term) {
   if (term.termType === 'Literal') {
     const datatype = term.datatype ? `^^${env.shrink(term.datatype)}` : ''
     const language = term.language ? `@${term.language}` : ''

@@ -1,97 +1,109 @@
 <template>
-  <GraphLayout
-    class="w-full h-full"
-    :nodes="resources"
-    :links="links"
-    :active-links="activeLinks"
-    :auto-zoom="false"
-    @link-enter="onLinkHover"
-    @link-out="onUnhover"
-  >
+  <GraphLayout class="w-full h-full" :nodes="resources" :links="links" :active-links="activeLinks" :auto-zoom="false"
+    @link-enter="onLinkHover" @link-out="onUnhover">
     <template v-slot:node="{ node }">
-      <ResourceCard
-        :resource="node"
-        :active-links="activeLinks"
-        :env="env"
-        @hover-title="onHoverResource"
-        @unhover-title="onUnhover"
-        @hover-property="onHoverProperty"
-        @unhover-property="onUnhover"
-      />
+      <ResourceCard :resource="node" :active-links="activeLinks" :env="env" @hover-title="onHoverResource"
+        @unhover-title="onUnhover" @hover-property="onHoverProperty" @unhover-property="onUnhover" />
     </template>
   </GraphLayout>
 </template>
 
-<script>
+<script lang="ts">
 import { computed, defineComponent, ref, toRefs } from 'vue'
 import { GraphLayout } from '@zazuko/vue-graph-layout'
-import rdf from 'rdf-ext'
-
 import ResourceCard from './ResourceCard.vue'
+import DatasetExt from 'rdf-ext/lib/Dataset'
+import TermSet from '@rdfjs/term-set';
+
+import { Term } from 'rdf-js'
 
 export default defineComponent({
   name: 'GraphView',
   props: {
-    dataset: { required: true },
-    env: { required: true },
+    dataset: {
+      type: DatasetExt,
+      required: true
+    },
+    env: {
+      required: true
+    },
   },
   components: { GraphLayout, ResourceCard },
 
-  setup (props) {
-    const { dataset, env } = toRefs(props)
+  setup(props) {
+
+    const refs = toRefs(props);
+    const dataset = refs.dataset
+    const env = refs.env
 
     const resources = computed(() => resourcesFromDataset(dataset.value, env.value))
     const links = computed(() => linksFromResources(resources.value))
     const activeLinks = ref([])
+
 
     return {
       resources,
       links,
       activeLinks,
     }
+
   },
 
   methods: {
-    onLinkHover (link) {
+    onLinkHover(link): void {
+
       this.activeLinks.push(link)
+
     },
 
-    onUnhover () {
+    onUnhover(): void {
+
       this.activeLinks = []
+
     },
 
-    onHoverResource (resource) {
+    onHoverResource(resource): void {
+
       this.activeLinks = this.links.filter((link) => link.source === resource.id)
+
     },
 
-    onHoverProperty (resource, property) {
+    onHoverProperty(resource, property): void {
+
       this.activeLinks = this.links.filter((link) => (
         link.source === resource.id &&
         link.sourceProperty === property.id
       ))
+
     },
   }
 })
 
-function resourcesFromDataset (dataset, env) {
-  const subjects = rdf.termSet([...dataset].map(({ subject }) => subject))
+function resourcesFromDataset(dataset: DatasetExt, env: any) {
 
-  return [...subjects].map(subject => {
+  const subjectsSet = new TermSet<Term>([...dataset].map(({ subject }) => subject))
+
+  return [...subjectsSet].map(subject => {
+
     const quads = dataset.match(subject)
     const properties = [...quads].reduce((acc, { predicate, object }) => {
+
       if (!acc.has(predicate.value)) {
+
         const property = {
           id: predicate.value,
           term: predicate,
           name: env.shrink(predicate),
-          values: rdf.termSet(),
+          values: new TermSet<Term>(),
         }
         acc.set(predicate.value, property)
+
       }
 
       acc.get(predicate.value).values.add(object)
 
       return acc
+
     }, new Map())
 
     return {
@@ -100,30 +112,40 @@ function resourcesFromDataset (dataset, env) {
       name: env.shrink(subject),
       properties: [...properties.values()],
     }
+
   })
+
 }
 
-function linksFromResources (resources) {
-  const resourceIds = rdf.termSet(resources.map(({ term }) => term))
+function linksFromResources(resources) {
+
+  const resourceIds = new TermSet(resources.map(({ term }) => term))
 
   return resources
     .flatMap(resource => resource.properties.map((property) => ({ ...property, resource })))
     .reduce((links, property) => {
+
       property.values.forEach((value) => {
+
         const source = property.resource.term
         const target = value
 
         if (resourceIds.has(target)) {
+
           links.push({
             source: source.value,
             target: target.value,
             sourceProperty: property.id,
             label: property.name,
           })
+
         }
+
       })
 
       return links
+
     }, [])
+
 }
 </script>

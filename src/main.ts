@@ -6,7 +6,7 @@ import './registerServiceWorker'
 const app = createApp(App)
 
 app.directive('focus', {
-  mounted (el) {
+  mounted(el) {
     el.focus()
   },
 })
