@@ -51,13 +51,13 @@ export default defineComponent({
   },
 
   computed: {
-    isActive() {
+    isActive(): boolean {
       return this.activeLinks.some((link) => link.target === this.resource.id)
     }
   },
 
   methods: {
-    isPropertyActive(property) {
+    isPropertyActive(property): boolean {
       return this.activeLinks.some((link) => (
         link.source === this.resource.id &&
         link.sourceProperty === property.id

@@ -31,8 +31,7 @@ export default defineComponent({
   components: { GraphLayout, ResourceCard },
 
   setup(props) {
-
-    const refs = toRefs(props);
+    const refs = toRefs(props)
     const dataset = refs.dataset
     const env = refs.env
 
@@ -57,39 +56,28 @@ export default defineComponent({
     },
 
     onUnhover(): void {
-
       this.activeLinks = []
-
     },
 
     onHoverResource(resource): void {
-
       this.activeLinks = this.links.filter((link) => link.source === resource.id)
-
     },
 
     onHoverProperty(resource, property): void {
-
       this.activeLinks = this.links.filter((link) => (
         link.source === resource.id &&
         link.sourceProperty === property.id
       ))
-
     },
   }
 })
 
-function resourcesFromDataset(dataset: DatasetExt, env: any) {
-
+function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
   const subjectsSet = new TermSet<Term>([...dataset].map(({ subject }) => subject))
-
   return [...subjectsSet].map(subject => {
-
     const quads = dataset.match(subject)
     const properties = [...quads].reduce((acc, { predicate, object }) => {
-
       if (!acc.has(predicate.value)) {
-
         const property = {
           id: predicate.value,
           term: predicate,
@@ -97,13 +85,9 @@ function resourcesFromDataset(dataset: DatasetExt, env: any) {
           values: new TermSet<Term>(),
         }
         acc.set(predicate.value, property)
-
       }
-
       acc.get(predicate.value).values.add(object)
-
       return acc
-
     }, new Map())
 
     return {
@@ -114,13 +98,31 @@ function resourcesFromDataset(dataset: DatasetExt, env: any) {
     }
 
   })
-
 }
 
-function linksFromResources(resources) {
+interface Resource {
+  id: string,
+  name: string,
+  term: Term,
+  properties: Property[]
+}
+
+interface Property {
+  id: string,
+  name: string,
+  values: TermSet,
+}
+
+interface Link {
+  source: string,
+  target: string,
+  sourceProperty: string,
+  label: string,
+}
+
+function linksFromResources(resources: Resource[]): Link[] {
 
   const resourceIds = new TermSet(resources.map(({ term }) => term))
-
   return resources
     .flatMap(resource => resource.properties.map((property) => ({ ...property, resource })))
     .reduce((links, property) => {
@@ -138,13 +140,9 @@ function linksFromResources(resources) {
             sourceProperty: property.id,
             label: property.name,
           })
-
         }
-
       })
-
       return links
-
     }, [])
 
 }

@@ -4,6 +4,7 @@ export function useLocalStorage(key: string, def = undefined) {
 
   const value = ref(null)
 
+  // ----- init 
   const init = () => {
 
     const serializedVal = localStorage.getItem(key)
@@ -13,12 +14,14 @@ export function useLocalStorage(key: string, def = undefined) {
       : def
 
   }
+  // ----- end init 
 
+  // -- save
   const save = () => {
-
     localStorage.setItem(key, JSON.stringify(value.value))
-
   }
+  // -- end save 
+
 
   let initialized = false
 
@@ -30,22 +33,17 @@ export function useLocalStorage(key: string, def = undefined) {
 
   }
 
-  function onStoredValueChange(e) {
-
-    if (e.key === key) {
-
-      value.value = e.newValue ? parseValue(e.newValue) : null
-
+  function onStoredValueChange(event: StorageEvent): void {
+    if (event.key === key) {
+      value.value = event.newValue ? parseValue(event.newValue) : null
     }
-
   }
 
   onMounted(() => {
-
+    console.log('mount called');
     if (!initialized) {
-
+      console.log('init');
       init()
-
     }
 
     window.addEventListener('storage', onStoredValueChange, true)
@@ -65,20 +63,14 @@ export function useLocalStorage(key: string, def = undefined) {
   }
 
 }
+// -----
 
-function parseValue(serializedVal) {
-
+function parseValue(serializedVal: string): string | any {
   let value = null
   try {
-
     value = JSON.parse(serializedVal)
-
   } catch {
-
     value = serializedVal
-
   }
-
   return value
-
 }
