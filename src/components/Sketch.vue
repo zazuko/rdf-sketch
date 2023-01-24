@@ -131,7 +131,7 @@ import { useLocalStorage } from '../useLocalStorage'
 const formats = [...parsers.keys()]
 
 export default defineComponent({
-  name: 'Sketch',
+  name: 'ZazukoSketch',
   components: { PlusSmIcon, GraphView, Splitpanes, Pane, XCircleIcon },
 
   setup() {

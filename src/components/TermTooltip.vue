@@ -13,11 +13,19 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 
-export default defineComponent({
-  name: 'TermTooltip',
-  props: ['label'],
-})
+interface Props {
+  label: string
+}
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+const props = defineProps<Props>()
+
+</script>
+
+<script lang="ts">
+
+export default {
+  name: 'TermTooltip'
+}
 </script>

@@ -11,7 +11,7 @@ import { defineComponent } from 'vue'
 import TermTooltip from './TermTooltip.vue'
 
 export default defineComponent({
-  name: 'Term',
+  name: 'ZazukoTerm',
   props: ['term', 'env'],
 
   components: { TermTooltip },

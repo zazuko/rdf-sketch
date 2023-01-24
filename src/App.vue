@@ -1,15 +1,15 @@
 <template>
-  <Sketch />
+  <ZazukoSketch />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Sketch from './components/Sketch.vue'
+import ZazukoSketch from './components/Sketch.vue'
 
 export default defineComponent({
   name: 'App',
   components: {
-    Sketch
+    ZazukoSketch
   }
 })
 </script>

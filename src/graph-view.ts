@@ -7,6 +7,7 @@ import { shrink } from '@zazuko/rdf-vocabularies/shrink'
 import stringToStream from 'string-to-stream'
 import getStream from 'get-stream'
 import rdf from 'rdf-ext'
+import QuadExt from 'rdf-ext/lib/Quad'
 
 export { default as GraphView } from './components/GraphView.vue'
 
@@ -24,7 +25,7 @@ export function renderText (selector, { content, env = defaultEnv }) {
   const promise = getStream.array(stream)
 
   promise.then(quads => {
-    const dataset = rdf.dataset(quads)
+    const dataset = rdf.dataset(quads as QuadExt[])
     const app = createApp(GraphView, { dataset, env: env || defaultEnv })
 
     app.mount(selector)
