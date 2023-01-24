@@ -4,28 +4,31 @@
   </TermTooltip>
 </template>
 
-<script lang="ts">
-import { Term } from 'rdf-js'
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 import TermTooltip from './TermTooltip.vue'
+import { Term } from 'rdf-js'
+import { computed } from 'vue'
 
-export default defineComponent({
-  name: 'ZazukoTerm',
-  props: ['term', 'env'],
+interface Props {
+  term: Term,
+  env: any
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+const props = defineProps<Props>()
 
-  components: { TermTooltip },
+const displayValue = computed(() => termValue(props.env, props.term))
 
-  data() {
-    const displayValue = termValue(this.env, this.term)
-    const expandedValue = expandValue(this.env, this.term)
-
-    return {
-      displayValue,
-      language: this.term && this.term.language,
-      tooltip: expandedValue !== displayValue ? expandedValue : ''
-    }
+const language = computed(() => {
+  if (props.term.termType !== "Literal") {
+    return null
   }
+  return props.term.language ?? null;
+})
+const tooltip = computed(() => {
+  const expandedValue = expandValue(props.env, props.term)
+  return expandedValue !== displayValue.value ? expandedValue : ''
 })
 
 function termValue(env: any, term: Term): string {
@@ -44,4 +47,13 @@ function expandValue(env: any, term: Term): string {
   }
   return term.value
 }
+
+</script>
+
+<script lang="ts">
+
+export default {
+  name: 'ZazukoTerm',
+}
+
 </script>
