@@ -41,6 +41,7 @@ export function useLocalStorage(key: string, def = undefined) {
 
   onMounted(() => {
     console.log('mount called');
+
     if (!initialized) {
       console.log('init');
       init()
