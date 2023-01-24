@@ -2,16 +2,17 @@
   <ZazukoSketch />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 import ZazukoSketch from './components/Sketch.vue'
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    ZazukoSketch
-  }
-})
+</script>
+
+<script lang="ts">
+
+export default {
+  name: 'App'
+}
 </script>
 
 <style>
