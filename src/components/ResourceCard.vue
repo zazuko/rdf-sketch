@@ -30,41 +30,43 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 
 import Term from './Term.vue'
 import TermTooltip from './TermTooltip.vue'
 
-export default defineComponent({
-  name: 'ResourceCard',
-  props: [
-    'resource',
-    'activeLinks',
-    'env',
-  ],
+import { computed } from 'vue'
 
-  components: { Term, TermTooltip },
+import { Link } from '@/model/link.model';
+import { Property, Resource } from '@/model/resource.model';
 
-  data() {
-    return {}
-  },
+interface Props {
+  resource: Resource,
+  activeLinks: Link[],
+  env: any
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+const props = defineProps<Props>()
 
-  computed: {
-    isActive(): boolean {
-      return this.activeLinks.some((link) => link.target === this.resource.id)
-    }
-  },
-
-  methods: {
-    isPropertyActive(property): boolean {
-      return this.activeLinks.some((link) => (
-        link.source === this.resource.id &&
-        link.sourceProperty === property.id
-      ))
-    }
-  }
+const isActive = computed(() => {
+  return props.activeLinks.some((link) => link.target === props.resource.id)
 })
+
+function isPropertyActive(property: Property): boolean {
+  return props.activeLinks.some((link) => (
+    link.source === props.resource.id &&
+    link.sourceProperty === property.id
+  ))
+}
+
+</script>
+
+<script lang="ts">
+
+export default {
+  name: 'ResourceCard'
+}
+
 </script>
 
 <style scoped>
