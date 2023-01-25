@@ -106,7 +106,6 @@ class TabController {
 
   }
   selectTab(id: string): void { }
-  renameTab(name: string): void { }
   saveTabName(name: string): void { }
 }
 const formats = [...parsers.keys()]
@@ -263,12 +262,6 @@ function useTabs() {
 
   }
 
-  const renameTab = (tab) => {
-
-    tab.isEditing = true
-
-  }
-
   const saveTabName = (tab) => {
     console.log('save tab:', tab);
     tab.isEditing = false
@@ -306,7 +299,6 @@ function useTabs() {
     saveTabs,
     justSaved,
     selectTab,
-    renameTab,
     saveTabName,
     updateTabName
   }
