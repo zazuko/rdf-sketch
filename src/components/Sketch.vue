@@ -2,31 +2,10 @@
   <div class="h-full flex flex-col">
     <!-- page header -->
     <div class="bg-white shadow-sm flex justify-between items-stretch">
-      <!-- tab head -->
-      <ul class="flex items-stretch overflow-x-auto">
-        <li v-for="tab in tabs" :key="tab.id" class="px-2 py-2 border whitespace-nowrap flex items-center gap-2"
-          :class="{ 'border-t-2 border-t-primary-500': tab.id === selectedTabId }">
-          <form v-if="tab.isEditing" @submit.prevent="saveTabName(tab)">
-            <input type="text" v-model="tab.label" @blur="saveTabName(tab)" v-focus />
-          </form>
-          <button v-else-if="tab.id === selectedTabId" @click="renameTab(tab)" class="cursor-text" title="Rename tab">
-            {{ tab.label }}
-          </button>
-          <button v-else @click="selectTab(tab.id)">
-            {{ tab.label }}
-          </button>
 
-          <button @click="deleteTab(tab.id)" title="Delete tab">
-            <XCircleIcon class="w-4 h-4 text-gray-500 hover:text-gray-700" />
-          </button>
-        </li>
-        <li class="px-2 py-2 flex items-center">
-          <button @click="addTab">
-            <PlusSmIcon class="w-5 h-5" />
-          </button>
-        </li>
-      </ul>
-      <!-- end tab head -->
+      <TabsComponent :tabs="tabs" :selected-tab-id="selectedTabId" @selected="selectTab" @delete="deleteTab"
+        @add="addTab" @update="updateTabName">
+      </TabsComponent>
 
       <div class="px-4 py-2 shadow-md flex items-center gap-4">
         <div class="flex items-center gap-2">
@@ -56,9 +35,13 @@
         <rdf-editor class="w-full h-full overflow-hidden" :value.prop="selectedTab.content" :format="selectedTab.format"
           ref="shaclEditor" prefixes="schema" auto-parse parseDelay="1000" @parsing-failed="onParsingFailed"
           @quads-changed="onQuadsChanged" @prefixes-parsed="onPrefixesParsed" />
+
+
         <div v-if="parseError" class="px-4 py-2 bg-red-500 text-white">
           {{ parseError }}
         </div>
+
+
         <!-- end editor -->
       </Pane>
       <Pane>
@@ -82,8 +65,6 @@ import 'splitpanes/dist/splitpanes.css'
 import '@rdfjs-elements/rdf-editor'
 import { parsers } from '@rdf-esm/formats-common'
 import { computed, defineComponent, Ref, ref } from 'vue'
-import { PlusSmIcon } from '@heroicons/vue/solid'
-import { XCircleIcon } from '@heroicons/vue/outline'
 import { nanoid } from 'nanoid'
 import debounce from 'lodash.debounce'
 import rdf from 'rdf-ext'
@@ -92,17 +73,11 @@ import GraphView from './GraphView.vue'
 import PaneHeader from './PaneHeader.vue'
 import ZazukoLogo from './ZazukoLogo.vue'
 import GitHubLogo from './GitHubLogo.vue'
+import TabsComponent from './Tabs.vue'
 import { useLocalStorage } from '../useLocalStorage'
 import QuadExt from 'rdf-ext/lib/Quad'
+import { Tab } from '@/model/tab.model'
 
-
-interface Tab {
-  content: string,
-  format: string
-  id: string,
-  isEditing?: boolean,
-  label: string
-}
 class TabController {
   tabs: Ref<Tab[]> = null;
   justSaved = ref(false)
@@ -118,6 +93,7 @@ class TabController {
   selectedTab(): string {
     return ''
   }
+
   addTab() {
 
     const tabId = nanoid()
@@ -137,7 +113,7 @@ const formats = [...parsers.keys()]
 
 export default defineComponent({
   name: 'ZazukoSketch',
-  components: { PlusSmIcon, GraphView, Splitpanes, Pane, XCircleIcon, ZazukoLogo, GitHubLogo, PaneHeader },
+  components: { GraphView, Splitpanes, Pane, ZazukoLogo, GitHubLogo, PaneHeader, TabsComponent },
 
   setup() {
     const tabCtrl = new TabController();
@@ -300,6 +276,13 @@ function useTabs() {
 
   }
 
+  const updateTabName = (tab: Tab, label: string) => {
+    tab.isEditing = false
+    tab.label = label
+    saveTabs()
+
+  }
+
   const selectedTab = computed(() => tabs.value.find(({ id }) => id === selectedTabId.value))
 
   if (tabs.value.length === 0) {
@@ -325,6 +308,7 @@ function useTabs() {
     selectTab,
     renameTab,
     saveTabName,
+    updateTabName
   }
 
 
