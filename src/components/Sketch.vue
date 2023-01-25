@@ -80,32 +80,87 @@ import { Tab } from '@/model/tab.model'
 
 class TabController {
   tabs: Ref<Tab[]> = null;
+  selectedTabId: Ref<string> = null;
   justSaved = ref(false)
 
+  private _tabsLocalStoreKey = 'sketchy.tabs';
+  private _currentTabLocalStoreKey = 'sketchy.currentTab';
+
   constructor() {
-    const loadedTabs = useLocalStorage('tabs', [])
-    this.tabs = loadedTabs.value;
+    const tabsJson = localStorage.getItem(this._tabsLocalStoreKey);
+    const tabs = JSON.parse(tabsJson ?? '[]');
+    if (tabs.length === 0) {
+      this.addTab()
+      return
+    }
+    // json schema validation ?
+    this.tabs.value = tabs;
+    const selectedTabId = localStorage.getItem(this._currentTabLocalStoreKey);
+    if (!selectedTabId) {
+      const firstTabId = this.tabs.value[0].id
+      this.selectedTabId.value = firstTabId;
+      return;
+    }
+    const tabsWithSelectedTabId = this.tabs.value.filter(t => t.id === selectedTabId)
+    if (tabsWithSelectedTabId.length !== 1) {
+      this.tabs.value = [];
+      this.addTab()
+      return
+    }
+    this.selectedTabId.value = selectedTabId
   }
 
-  selectedTabId(): string {
-    return ''
-  }
-  selectedTab(): string {
-    return ''
-  }
-
-  addTab() {
-
+  /**
+   * Add a new Tab. 
+   * @returns the new Tab
+   */
+  addTab(): Tab {
     const tabId = nanoid()
-    this.tabs.value.push({ id: tabId, label: 'Untitled', format: 'text/turtle', content: '' })
-    //selectedTabId.value = tabId
+    const newTab: Tab = { id: tabId, label: 'Untitled', format: 'text/turtle', content: '' }
+    this.tabs.value.push(newTab)
+    this.selectedTabId.value = tabId
     this.saveTabs()
+    return newTab
   }
-  deleteTab(id: string): void { }
-  saveTabs() {
+  /**
+   * This will remove a tab. And add a new empty tab if it was the last tab.
+   * 
+   * @param tabId id of the Tab to delete
+   */
+  deleteTab(tabId: string): void {
+    if (!window.confirm('Are you sure?')) {
+      return
+    }
+    this.tabs.value = this.tabs.value.filter((tab) => tab.id !== tabId)
+    if (this.tabs.value.length === 0) {
+      this.addTab()
+      return
+    }
+    if (this.selectedTabId.value === tabId) {
+      this.selectTab(this.tabs.value[0].id)
+    }
+    this.saveTabs()
 
   }
-  selectTab(id: string): void { }
+  /**
+   * Save tabs to localStore.
+   */
+  saveTabs(): void {
+    const tabs = this.tabs.value;
+    const tabsJson = JSON.stringify(tabs);
+    localStorage.setItem(this._tabsLocalStoreKey, tabsJson)
+  }
+
+  /**
+   * This will set the selected.
+   * 
+   * @param tabId id of the selected tab
+   */
+  selectTab(tabId: string): void {
+    this.selectedTabId.value = tabId
+    localStorage.setItem(this._currentTabLocalStoreKey, tabId)
+  }
+
 }
 const formats = [...parsers.keys()]
 
@@ -116,6 +171,7 @@ export default defineComponent({
   setup() {
     const tabCtrl = new TabController();
     console.log('class', tabCtrl.tabs);
+    tabCtrl.saveTabs();
     const editorPrefixes = ref({})
     const env = computed(() => ({
       shrink(term) {
