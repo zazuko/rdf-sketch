@@ -3,8 +3,9 @@
     <!-- page header -->
     <div class="bg-white shadow-sm flex justify-between items-stretch">
 
-      <TabsComponent :tabs="tabs" :selected-tab-id="selectedTabId" @selected="selectTab" @delete="deleteTab"
-        @add="addTab" @update="updateTabName">
+      <TabsComponent :tabs="tabs" :selected-tab-id="selectedTabId" @selected="tabsController.selectTab($event)"
+        @delete="tabsController.deleteTab($event)" @add="tabsController.addTab()"
+        @update="(tab, label) => tabsController.updateTabName(tab, label)">
       </TabsComponent>
 
       <div class="px-4 py-2 shadow-md flex items-center gap-4">
@@ -51,20 +52,17 @@
         </div>
       </Pane>
     </Splitpanes>
-
-    <p v-show="justSaved" class="absolute bottom-2 right-2 text-green-500 text-xs">
-      Saved
-    </p>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+
 import prefixes from '@zazuko/rdf-vocabularies/prefixes'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import '@rdfjs-elements/rdf-editor'
 import { parsers } from '@rdf-esm/formats-common'
-import { computed, defineComponent, Ref, ref } from 'vue'
+import { computed, nextTick, onMounted, Ref, ref } from 'vue'
 import { nanoid } from 'nanoid'
 import debounce from 'lodash.debounce'
 import rdf from 'rdf-ext'
@@ -74,148 +72,51 @@ import PaneHeader from './PaneHeader.vue'
 import ZazukoLogo from './ZazukoLogo.vue'
 import GitHubLogo from './GitHubLogo.vue'
 import TabsComponent from './Tabs.vue'
-import { useLocalStorage } from '../useLocalStorage'
 import QuadExt from 'rdf-ext/lib/Quad'
-import { Tab } from '@/model/tab.model'
+import { Link } from '@/model/link.model'
+import { TabsController } from '@/class/tab-controller.class'
+import DatasetExt from 'rdf-ext/lib/Dataset'
 
-class TabController {
-  tabs: Ref<Tab[]> = null;
-  selectedTabId: Ref<string> = null;
-  justSaved = ref(false)
+const tabsController = TabsController
+const tabs = TabsController.tabs;
+const selectedTabId = TabsController.selectedTabId
+const selectedTab = TabsController.selectedTab
 
-  private _tabsLocalStoreKey = 'sketchy.tabs';
-  private _currentTabLocalStoreKey = 'sketchy.currentTab';
-
-  constructor() {
-    const tabsJson = localStorage.getItem(this._tabsLocalStoreKey);
-    const tabs = JSON.parse(tabsJson ?? '[]');
-    if (tabs.length === 0) {
-      this.addTab()
-      return
-    }
-    // json schema validation ?
-    this.tabs.value = tabs;
-    const selectedTabId = localStorage.getItem(this._currentTabLocalStoreKey);
-    if (!selectedTabId) {
-      const firstTabId = this.tabs.value[0].id
-      this.selectedTabId.value = firstTabId;
-      return;
-    }
-    const tabsWithSelectedTabId = this.tabs.value.filter(t => t.id === selectedTabId)
-    if (tabsWithSelectedTabId.length !== 1) {
-      this.tabs.value = [];
-      this.addTab()
-      return
-    }
-    this.selectedTabId.value = selectedTabId
-  }
-
-  /**
-   * Add a new Tab. 
-   * @returns the new Tab
-   */
-  addTab(): Tab {
-    const tabId = nanoid()
-    const newTab: Tab = { id: tabId, label: 'Untitled', format: 'text/turtle', content: '' }
-    this.tabs.value.push(newTab)
-    this.selectedTabId.value = tabId
-    this.saveTabs()
-    return newTab
-  }
-  /**
-   * This will remove a tab. And add a new empty tab if it was the last tab.
-   * 
-   * @param tabId id of the Tab to delete
-   */
-  deleteTab(tabId: string): void {
-    if (!window.confirm('Are you sure?')) {
-      return
-    }
-    this.tabs.value = this.tabs.value.filter((tab) => tab.id !== tabId)
-    if (this.tabs.value.length === 0) {
-      this.addTab()
-      return
-    }
-    if (this.selectedTabId.value === tabId) {
-      this.selectTab(this.tabs.value[0].id)
-    }
-    this.saveTabs()
-
-  }
-  /**
-   * Save tabs to localStore.
-   */
-  saveTabs(): void {
-    const tabs = this.tabs.value;
-    const tabsJson = JSON.stringify(tabs);
-    localStorage.setItem(this._tabsLocalStoreKey, tabsJson)
-  }
-
-  /**
-   * This will set the selected.
-   * 
-   * @param tabId id of the selected tab
-   */
-  selectTab(tabId: string): void {
-    this.selectedTabId.value = tabId
-    localStorage.setItem(this._currentTabLocalStoreKey, tabId)
-  }
-
-}
 const formats = [...parsers.keys()]
+const editorPrefixes: Ref<{ [key: string]: string }> = ref({});
+const dataset: Ref<DatasetExt> = ref<DatasetExt>(rdf.dataset());
+let parseError: Ref<string> = ref(null)
+let resources: any = null;
+const activeLinks: Ref<Link[]> = ref([])
+const shaclEditor = ref(null)
 
-export default defineComponent({
-  name: 'ZazukoSketch',
-  components: { GraphView, Splitpanes, Pane, ZazukoLogo, GitHubLogo, PaneHeader, TabsComponent },
-
-  setup() {
-    const tabCtrl = new TabController();
-    console.log('class', tabCtrl.tabs);
-    tabCtrl.saveTabs();
-    const editorPrefixes = ref({})
-    const env = computed(() => ({
-      shrink(term) {
-
-        // fix ts
-        const factory = (rdf as any).clone()
-
-        for (const [prefix, uri] of Object.entries(prefixes)) {
-
-          factory.prefixes.set(prefix, factory.namedNode(uri))
-
-        }
-
-        for (const [prefix, uri] of Object.entries(editorPrefixes.value)) {
-
-          factory.prefixes.set(prefix, factory.namedNode(uri))
-
-        }
-
-        return factory.prefixes.shrink(term) || term.value
-
-      },
-    }))
-
-    return {
-      ...useTabs(),
-      editorPrefixes,
-      env,
+const env = computed(() => ({
+  shrink(term) {
+    // fix ts
+    const factory = (rdf as any).clone()
+    for (const [prefix, uri] of Object.entries(prefixes)) {
+      factory.prefixes.set(prefix, factory.namedNode(uri))
     }
-
-  },
-
-  data() {
-
-    return {
-      formats,
-      dataset: rdf.dataset(),
-      parseError: null,
-      activeLinks: [],
+    for (const [prefix, uri] of Object.entries(editorPrefixes.value)) {
+      factory.prefixes.set(prefix, factory.namedNode(uri))
     }
-
+    return factory.prefixes.shrink(term) || term.value
   },
+}))
 
-  mounted() {
+onMounted(async () => {
+
+  await nextTick();
+  const codeMirror = computed(() => shaclEditor.value.codeMirror)
+  codeMirror.value.editor.on('change', (_c, _e) => {
+    selectedTab.value.content = codeMirror.value.value
+    tabsController.saveTabs()
+  })
+
+})
+
+/*
+ mounted() {
 
     this.$nextTick(() => {
 
@@ -229,127 +130,33 @@ export default defineComponent({
       })
 
     })
+  */
 
-  },
-
-  methods: {
-    onParsingFailed(e: CustomEvent) {
-      this.parseError = e.detail.error
-    },
-
-    onQuadsChanged(e: CustomEvent) {
-      this.parseError = null
-      this.loadResources(e.detail.value)
-    },
-
-    onPrefixesParsed(e: CustomEvent) {
-      const prefixes = e.detail.prefixes
-      this.editorPrefixes = prefixes
-    },
-
-    loadResources(quads: QuadExt[]) {
-      this.resources = []
-      this.dataset = rdf.dataset(quads)
-    },
-  }
-})
-
-
-function useTabs() {
-
-  // TODO: Validate stored state?
-  const loadedTabs = useLocalStorage('tabs', [])
-  const tabs = loadedTabs.value;
-  const syncTabs = loadedTabs.save;
-
-  const { value: selectedTabId, save: syncSelectedTab } = useLocalStorage('selectedTabId')
-
-
-  const justSaved = ref(false)
-  const saveTabs = debounce(() => {
-
-    syncTabs()
-    syncSelectedTab()
-    justSaved.value = true
-    setTimeout(() => {
-
-      justSaved.value = false
-
-    }, 1000)
-
-  }, 1000)
-
-  const addTab = () => {
-
-    const tabId = nanoid()
-    tabs.value.push({ id: tabId, label: 'Untitled', format: 'text/turtle', content: '' })
-    selectedTabId.value = tabId
-    saveTabs()
-
-  }
-
-  const deleteTab = (idToDelete) => {
-
-    if (!window.confirm('Are you sure?')) return
-
-    tabs.value = tabs.value.filter(({ id }) => id !== idToDelete)
-
-    if (tabs.value.length === 0) {
-
-      addTab()
-
-    }
-
-    if (selectedTabId.value === idToDelete) {
-
-      selectedTabId.value = tabs.value[0].id
-
-    }
-
-    saveTabs()
-
-  }
-
-  const selectTab = (id) => {
-
-    selectedTabId.value = id
-    saveTabs()
-
-  }
-
-  const updateTabName = (tab: Tab, label: string) => {
-    tab.isEditing = false
-    tab.label = label
-    saveTabs()
-
-  }
-
-  const selectedTab = computed(() => tabs.value.find(({ id }) => id === selectedTabId.value))
-
-  if (tabs.value.length === 0) {
-
-    addTab()
-
-  }
-
-  if (!selectedTabId.value) {
-
-    selectedTabId.value = tabs.value[0].id
-
-  }
-
-  return {
-    tabs,
-    selectedTabId,
-    selectedTab,
-    addTab,
-    deleteTab,
-    saveTabs,
-    justSaved,
-    selectTab,
-    updateTabName
-  }
-
-
+function onParsingFailed(e: CustomEvent): void {
+  parseError.value = e.detail.error
 }
+
+function onQuadsChanged(e: CustomEvent): void {
+  parseError.value = null
+  loadResources(e.detail.value)
+}
+
+function onPrefixesParsed(e: CustomEvent) {
+  const prefixes = e.detail.prefixes
+  editorPrefixes.value = prefixes
+}
+
+function loadResources(quads: QuadExt[]) {
+  resources = []
+  dataset.value = rdf.dataset(quads)
+}
+
+</script>
+
+<script lang="ts">
+
+export default {
+  name: 'ZazukoSketch',
+}
+
 </script>

@@ -6,12 +6,7 @@
 </template>
 
 <script setup lang="ts">
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-import TermTooltip from './TermTooltip.vue'
-import { Term } from 'rdf-js'
-import { computed } from 'vue'
-
 interface Props {
     label: string,
 }
