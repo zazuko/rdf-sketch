@@ -8,69 +8,51 @@
   </GraphLayout>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref, toRefs } from 'vue'
+<script setup lang="ts">
+
+import { computed, ref } from 'vue'
 import { GraphLayout } from '@zazuko/vue-graph-layout'
 import ResourceCard from './ResourceCard.vue'
 import DatasetExt from 'rdf-ext/lib/Dataset'
-import TermSet from '@rdfjs/term-set';
 
 import { Term } from 'rdf-js'
+import { Property, Resource } from '@/model/resource.model';
+import { Link } from '@/model/link.model'
+import TermSet from '@rdfjs/term-set'
 
-export default defineComponent({
-  name: 'GraphView',
-  props: {
-    dataset: {
-      type: DatasetExt,
-      required: true
-    },
-    env: {
-      required: true
-    },
-  },
-  components: { GraphLayout, ResourceCard },
+interface Props {
+  dataset: DatasetExt,
+  env: any
+}
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+const props = defineProps<Props>()
 
-  setup(props) {
-    const refs = toRefs(props)
-    const dataset = refs.dataset
-    const env = refs.env
+const resources = computed(() => resourcesFromDataset(props.dataset, props.env))
+const links = computed(() => linksFromResources(resources.value))
+const activeLinks = ref([])
 
-    const resources = computed(() => resourcesFromDataset(dataset.value, env.value))
-    const links = computed(() => linksFromResources(resources.value))
-    const activeLinks = ref([])
+function onLinkHover(link: Link): void {
+  activeLinks.value.push(link)
+}
 
+function onUnhover(): void {
+  activeLinks.value = []
+}
 
-    return {
-      resources,
-      links,
-      activeLinks,
-    }
+function onHoverResource(resource: Resource): void {
+  activeLinks.value = links.value.filter((link) => link.source === resource.id)
+}
 
-  },
+function onHoverProperty(resource: Resource, property: Property): void {
+  activeLinks.value = links.value.filter(link => (
+    link.source === resource.id && link.sourceProperty === property.id))
+}
 
-  methods: {
-    onLinkHover(link): void {
+/**
+ * 
+ * 
+ */
 
-      this.activeLinks.push(link)
-
-    },
-
-    onUnhover(): void {
-      this.activeLinks = []
-    },
-
-    onHoverResource(resource): void {
-      this.activeLinks = this.links.filter((link) => link.source === resource.id)
-    },
-
-    onHoverProperty(resource, property): void {
-      this.activeLinks = this.links.filter((link) => (
-        link.source === resource.id &&
-        link.sourceProperty === property.id
-      ))
-    },
-  }
-})
 
 function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
   const subjectsSet = new TermSet<Term>([...dataset].map(({ subject }) => subject))
@@ -100,25 +82,6 @@ function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
   })
 }
 
-interface Resource {
-  id: string,
-  name: string,
-  term: Term,
-  properties: Property[]
-}
-
-interface Property {
-  id: string,
-  name: string,
-  values: TermSet,
-}
-
-interface Link {
-  source: string,
-  target: string,
-  sourceProperty: string,
-  label: string,
-}
 
 function linksFromResources(resources: Resource[]): Link[] {
 
@@ -144,6 +107,12 @@ function linksFromResources(resources: Resource[]): Link[] {
       })
       return links
     }, [])
+}
+</script>
 
+<script lang="ts">
+
+export default {
+  name: 'GraphView'
 }
 </script>
