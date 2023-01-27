@@ -15,10 +15,9 @@ import { GraphLayout } from '@zazuko/vue-graph-layout'
 import ResourceCard from './ResourceCard.vue'
 import DatasetExt from 'rdf-ext/lib/Dataset'
 
-import { Term } from 'rdf-js'
 import { Property, Resource } from '@/model/resource.model';
 import { Link } from '@/model/link.model'
-import TermSet from '@rdfjs/term-set'
+import { linksFromResources, resourcesFromDataset } from '@/resources-utils'
 
 interface Props {
   dataset: DatasetExt,
@@ -48,58 +47,6 @@ function onHoverProperty(resource: Resource, property: Property): void {
     link.source === resource.id && link.sourceProperty === property.id))
 }
 
-/**
- * 
- * 
- */
-
-function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
-  const subjectsSet = new TermSet<Term>([...dataset].map(({ subject }) => subject))
-  return [...subjectsSet].map(subject => {
-    const quads = dataset.match(subject)
-    const properties = [...quads].reduce((acc, { predicate, object }) => {
-      if (!acc.has(predicate.value)) {
-        const property = {
-          id: predicate.value,
-          term: predicate,
-          name: env.shrink(predicate),
-          values: new TermSet<Term>(),
-        }
-        acc.set(predicate.value, property)
-      }
-      acc.get(predicate.value).values.add(object)
-      return acc
-    }, new Map())
-
-    return {
-      id: subject.value,
-      term: subject,
-      name: env.shrink(subject),
-      properties: [...properties.values()],
-    }
-  })
-}
-
-function linksFromResources(resources: Resource[]): Link[] {
-  const resourceIds = new TermSet(resources.map(({ term }) => term))
-  return resources
-    .flatMap(resource => resource.properties.map((property) => ({ ...property, resource })))
-    .reduce((links, property) => {
-      property.values.forEach((value) => {
-        const source = property.resource.term
-        const target = value
-        if (resourceIds.has(target)) {
-          links.push({
-            source: source.value,
-            target: target.value,
-            sourceProperty: property.id,
-            label: property.name,
-          })
-        }
-      })
-      return links
-    }, [])
-}
 </script>
 
 <script lang="ts">
