@@ -53,7 +53,6 @@ function onHoverProperty(resource: Resource, property: Property): void {
  * 
  */
 
-
 function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
   const subjectsSet = new TermSet<Term>([...dataset].map(({ subject }) => subject))
   return [...subjectsSet].map(subject => {
@@ -78,25 +77,18 @@ function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
       name: env.shrink(subject),
       properties: [...properties.values()],
     }
-
   })
 }
 
-
 function linksFromResources(resources: Resource[]): Link[] {
-
   const resourceIds = new TermSet(resources.map(({ term }) => term))
   return resources
     .flatMap(resource => resource.properties.map((property) => ({ ...property, resource })))
     .reduce((links, property) => {
-
       property.values.forEach((value) => {
-
         const source = property.resource.term
         const target = value
-
         if (resourceIds.has(target)) {
-
           links.push({
             source: source.value,
             target: target.value,
@@ -115,4 +107,5 @@ function linksFromResources(resources: Resource[]): Link[] {
 export default {
   name: 'GraphView'
 }
+
 </script>
