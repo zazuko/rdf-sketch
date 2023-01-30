@@ -5,9 +5,12 @@ import { Link } from "./model/link.model"
 import { Resource } from "./model/resource.model"
 
 export function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
-    const subjectsSet = new TermSet<Term>([...dataset].map(({ subject }) => subject))
-    return [...subjectsSet].map(subject => {
-        const quads = dataset.match(subject)
+    const extractedSubjects = [...dataset].map(quad => quad.subject)
+    const subjectSet = new TermSet<Term>([...extractedSubjects])
+
+
+    return [...subjectSet].map(node => {
+        const quads = dataset.match(node)
         const properties = [...quads].reduce((acc, { predicate, object }) => {
             if (!acc.has(predicate.value)) {
                 const property = {
@@ -23,42 +26,34 @@ export function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] 
         }, new Map())
 
         return {
-            id: subject.value,
-            term: subject,
-            name: env.shrink(subject),
+            id: node.value,
+            term: node,
+            name: env.shrink(node),
             properties: [...properties.values()],
-        }
+        } as Resource
     })
 }
 
 export function linksFromResources(resources: Resource[]): Link[] {
-    const resourceIds = new TermSet(resources.map(({ term }) => {
-        console.log('t', term);
-        console.log('r', resources);
-        return term
+    const resourceIds = new TermSet(resources.map(resource => {
+        return resource.term
     }))
 
     return resources
-        .flatMap(resource => resource.properties.map((property) => {
-            console.log('p1', property);
+        .flatMap(resource => resource.properties.map(property => {
             return ({ ...property, resource })
         }))
-        .reduce((links, property) => {
-            console.log('---- link --- prop --')
-            console.log(links)
-            console.log(property)
-
+        .reduce((links: Link[], property) => {
             property.values.forEach((value) => {
                 const source = property.resource.term
                 const target = value
-                console.log('ressource is ', resourceIds);
                 if (resourceIds.has(target)) {
                     links.push({
                         source: source.value,
                         target: target.value,
                         sourceProperty: property.id,
                         label: property.name,
-                    })
+                    } as Link)
                 }
             })
             return links
