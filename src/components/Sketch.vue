@@ -36,14 +36,9 @@
         <rdf-editor class="w-full h-full overflow-hidden" :value.prop="selectedTab.content" :format="selectedTab.format"
           ref="shaclEditor" prefixes="schema" auto-parse parseDelay="1000" @parsing-failed="onParsingFailed"
           @quads-changed="onQuadsChanged" @prefixes-parsed="onPrefixesParsed" />
-
-
         <div v-if="parseError" class="px-4 py-2 bg-red-500 text-white">
           {{ parseError }}
         </div>
-
-
-        <!-- end editor -->
       </Pane>
       <Pane>
         <div class="flex-grow flex flex-col">
@@ -62,9 +57,7 @@ import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import '@rdfjs-elements/rdf-editor'
 import { parsers } from '@rdf-esm/formats-common'
-import { computed, nextTick, onMounted, Ref, ref } from 'vue'
-import { nanoid } from 'nanoid'
-import debounce from 'lodash.debounce'
+import { computed, nextTick, onMounted, onUnmounted, Ref, ref } from 'vue'
 import rdf from 'rdf-ext'
 
 import GraphView from './GraphView.vue'
@@ -73,7 +66,6 @@ import ZazukoLogo from './ZazukoLogo.vue'
 import GitHubLogo from './GitHubLogo.vue'
 import TabsComponent from './Tabs.vue'
 import QuadExt from 'rdf-ext/lib/Quad'
-import { Link } from '@/model/link.model'
 import { TabsController } from '@/class/tab-controller.class'
 import DatasetExt from 'rdf-ext/lib/Dataset'
 
@@ -85,9 +77,7 @@ const selectedTab = TabsController.selectedTab
 const formats = [...parsers.keys()]
 const editorPrefixes: Ref<{ [key: string]: string }> = ref({});
 const dataset: Ref<DatasetExt> = ref<DatasetExt>(rdf.dataset());
-let parseError: Ref<string> = ref(null)
-let resources: any = null;
-const activeLinks: Ref<Link[]> = ref([])
+const parseError: Ref<string> = ref(null)
 const shaclEditor = ref(null)
 
 const env = computed(() => ({
@@ -105,32 +95,18 @@ const env = computed(() => ({
 }))
 
 onMounted(async () => {
-
+  tabsController.listenToStorageEvents()
   await nextTick();
   const codeMirror = computed(() => shaclEditor.value.codeMirror)
   codeMirror.value.editor.on('change', (_c, _e) => {
     selectedTab.value.content = codeMirror.value.value
     tabsController.saveTabs()
   })
-
 })
 
-/*
- mounted() {
-
-    this.$nextTick(() => {
-
-      const codeMirror = this.$refs.shaclEditor.codeMirror
-
-      codeMirror.editor.on('change', (_c, _e) => {
-
-        this.selectedTab.content = codeMirror.value
-        this.saveTabs()
-
-      })
-
-    })
-  */
+onUnmounted(() => {
+  tabsController.stopListenToStorageEvents()
+})
 
 function onParsingFailed(e: CustomEvent): void {
   parseError.value = e.detail.error
@@ -147,16 +123,12 @@ function onPrefixesParsed(e: CustomEvent) {
 }
 
 function loadResources(quads: QuadExt[]) {
-  resources = []
   dataset.value = rdf.dataset(quads)
 }
-
 </script>
 
 <script lang="ts">
-
 export default {
   name: 'ZazukoSketch',
 }
-
 </script>

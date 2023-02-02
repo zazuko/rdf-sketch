@@ -8,19 +8,15 @@ class TabController {
     selectedTabId: Ref<string> = ref<string>(null);
     justSaved = ref(false)
     selectedTab: Ref<Tab> = ref<Tab>(null);
-    private _tabsLocalStoreKey = 'sketchy.tabs';
-    private _currentTabLocalStoreKey = 'sketchy.currentTab';
+    private _tabsLocalStoreKey = 'tabs';
+    private selectedTabIdLocalStoreKey = 'selectedTabId';
 
     constructor() {
         const tabsJson = localStorage.getItem(this._tabsLocalStoreKey);
-        const tabs = JSON.parse(tabsJson ?? '[]');
-        if (tabs.length === 0) {
-            this.addTab()
-            return
-        }
+        
         // json schema validation ?
-        this.tabs.value = tabs;
-        const selectedTabId = localStorage.getItem(this._currentTabLocalStoreKey);
+        this.tabs.value = this._initTabs(tabsJson);
+        const selectedTabId = localStorage.getItem(this.selectedTabIdLocalStoreKey);
         if (!selectedTabId) {
             const firstTabId = this.tabs.value[0].id
             this.selectTab(firstTabId)
@@ -92,7 +88,7 @@ class TabController {
         }
         this.selectedTabId.value = tabId
         this.selectedTab.value = foundTabs[0]
-        localStorage.setItem(this._currentTabLocalStoreKey, tabId)
+        localStorage.setItem(this.selectedTabIdLocalStoreKey, tabId)
     }
 
     /**
@@ -103,6 +99,35 @@ class TabController {
     updateTabName(tab: Tab, label: string): void {
         tab.label = label
         this.saveTabs()
+    }
+
+    private _initTabs(tabsJson: string): Tab[] {
+        const tabs = JSON.parse(tabsJson ?? '[]');
+        if (tabs.length === 0) {
+            this.addTab()
+        }
+        return tabs;
+    }
+
+    private _onStoredValueChange = (event: StorageEvent) => {
+        if (event.key === this._tabsLocalStoreKey) {
+            if (event.newValue !== JSON.stringify(this.tabs.value)) {
+                this.tabs.value = this._initTabs(event.newValue);
+                console.log('new tabs');
+            }
+        }
+        if (event.key === this.selectedTabIdLocalStoreKey) {
+            this.selectTab(event.newValue)
+        }
+
+      }
+    
+    public listenToStorageEvents() {
+        window.addEventListener('storage', this._onStoredValueChange, true)
+    }
+    
+    public stopListenToStorageEvents() {
+        window.removeEventListener('storage', this._onStoredValueChange)
     }
 }
 
