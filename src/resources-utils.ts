@@ -3,13 +3,16 @@ import DatasetExt from "rdf-ext/lib/Dataset"
 import { Term } from "rdf-js"
 import { Link } from "./model/link.model"
 import { Resource } from "./model/resource.model"
+import rdf from 'rdf-ext';
 
 export function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
     const extractedSubjects = [...dataset].map(quad => quad.subject)
-    const subjectSet = new TermSet<Term>([...extractedSubjects])
+    const extractedObject = [...dataset].filter(
+        quad => !quad.predicate.equals(rdf.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))).map(quad => quad.object).filter(o => o.termType === "BlankNode" || o.termType === "NamedNode")
 
+    const nodeSet = new TermSet<Term>([...extractedSubjects,...extractedObject ])
 
-    return [...subjectSet].map(node => {
+    return [...nodeSet].map(node => {
         const quads = dataset.match(node)
         const properties = [...quads].reduce((acc, { predicate, object }) => {
             if (!acc.has(predicate.value)) {
@@ -29,7 +32,7 @@ export function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] 
             id: node.value,
             term: node,
             name: env.shrink(node),
-            properties: [...properties.values()],
+            properties: [...properties.values()]
         } as Resource
     })
 }
@@ -53,9 +56,10 @@ export function linksFromResources(resources: Resource[]): Link[] {
                         target: target.value,
                         sourceProperty: property.id,
                         label: property.name,
-                    } as Link)
+                    })
                 }
             })
             return links
-        }, [])
+        }, 
+    []);
 }
