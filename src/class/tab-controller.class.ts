@@ -13,7 +13,6 @@ class TabController {
 
     constructor() {
         const tabsJson = localStorage.getItem(this._tabsLocalStoreKey);
-        
         // json schema validation ?
         this.tabs.value = this._initTabs(tabsJson);
         const selectedTabId = localStorage.getItem(this.selectedTabIdLocalStoreKey);
@@ -21,6 +20,11 @@ class TabController {
             const firstTabId = this.tabs.value[0].id
             this.selectTab(firstTabId)
             return;
+        }
+        if(selectedTabId === 'null') {
+            const firstTabId = this.tabs.value[0].id
+            this.selectTab(firstTabId)
+            return; 
         }
         const tabsWithSelectedTabId = this.tabs.value.filter(t => t.id === selectedTabId)
         if (tabsWithSelectedTabId.length !== 1) {
@@ -104,7 +108,7 @@ class TabController {
     private _initTabs(tabsJson: string): Tab[] {
         const tabs = JSON.parse(tabsJson ?? '[]');
         if (tabs.length === 0) {
-            this.addTab()
+            return [this.addTab()]
         }
         return tabs;
     }
@@ -113,8 +117,27 @@ class TabController {
         if (event.key === this._tabsLocalStoreKey) {
             if (event.newValue !== JSON.stringify(this.tabs.value)) {
                 this.tabs.value = this._initTabs(event.newValue);
-                console.log('new tabs');
-            }
+                const selectedTabId = localStorage.getItem(this.selectedTabIdLocalStoreKey);
+                if (!selectedTabId) {
+                    const firstTabId = this.tabs.value[0].id
+                    this.selectTab(firstTabId)
+                    return;
+                }
+                if(selectedTabId === 'null') {
+                    const firstTabId = this.tabs.value[0].id
+                    this.selectTab(firstTabId)
+                    return; 
+                }
+                const tabsWithSelectedTabId = this.tabs.value.filter(t => t.id === selectedTabId)
+                if (tabsWithSelectedTabId.length !== 1) {
+                    this.tabs.value = [];
+                    const newTab = this.addTab()
+                    this.selectedTab.value = newTab
+                    this.selectTab(newTab.id)
+                    return
+                }
+                this.selectedTab.value = tabsWithSelectedTabId[0]
+                this.selectedTabId.value = selectedTabId;            }
         }
         if (event.key === this.selectedTabIdLocalStoreKey) {
             this.selectTab(event.newValue)
