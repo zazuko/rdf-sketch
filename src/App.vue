@@ -1,13 +1,25 @@
 <template>
-  <Sketch />
+  <ZazukoSketch />
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-import Sketch from './components/Sketch.vue'
+<script setup lang="ts">
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+import ZazukoSketch from './components/Sketch.vue'
 
-export default defineComponent({
-  name: 'App',
-  components: { Sketch },
-})
 </script>
+
+<script lang="ts">
+
+export default {
+  name: 'App'
+}
+</script>
+
+<style>
+#app {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+</style>
