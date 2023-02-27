@@ -16,6 +16,7 @@
           <span>/</span>
           <ZazukoLogo />
         </div>
+        <ShareUrlButton ref="shareButton" @share="share" />
         <GitHubLogo />
       </div>
     </div>
@@ -63,11 +64,15 @@ import rdf from 'rdf-ext'
 import GraphView from './GraphView.vue'
 import PaneHeader from './PaneHeader.vue'
 import ZazukoLogo from './ZazukoLogo.vue'
+import ShareUrlButton from './ShareUrlButton.vue'
 import GitHubLogo from './GitHubLogo.vue'
 import TabsComponent from './Tabs.vue'
 import QuadExt from 'rdf-ext/lib/Quad'
 import { TabsController } from '@/class/tab-controller.class'
 import DatasetExt from 'rdf-ext/lib/Dataset'
+import { useUrlSearchParams } from '@vueuse/core'
+
+const params = useUrlSearchParams('hash-params')
 
 const tabsController = TabsController
 const tabs = TabsController.tabs;
@@ -79,6 +84,7 @@ const editorPrefixes: Ref<{ [key: string]: string }> = ref({});
 const dataset: Ref<DatasetExt> = ref<DatasetExt>(rdf.dataset());
 const parseError: Ref<string> = ref(null)
 const shaclEditor = ref(null)
+const shareButton = ref()
 
 const env = computed(() => ({
   shrink(term) {
@@ -95,6 +101,11 @@ const env = computed(() => ({
 }))
 
 onMounted(async () => {
+  if (params.rdf && !Array.isArray(params.rdf)) {
+    selectedTab.value.content = params.rdf
+    selectedTab.value.format = 'text/n3'
+  }
+
   tabsController.listenToStorageEvents()
   await nextTick();
   const codeMirror = computed(() => shaclEditor.value.codeMirror)
@@ -125,6 +136,13 @@ function onPrefixesParsed(e: CustomEvent) {
 function loadResources(quads: QuadExt[]) {
   dataset.value = rdf.dataset(quads)
 }
+
+function share() {
+  const datasetN3 = dataset.value.toString()
+  const url = new URL(`${document.location.protocol}//${document.location.host}/#rdf=${encodeURIComponent(datasetN3)}`)
+  shareButton.value.copyURL(url)
+}
+
 </script>
 
 <script lang="ts">
