@@ -101,9 +101,9 @@ const env = computed(() => ({
 }))
 
 onMounted(async () => {
-  if (params.rdf && !Array.isArray(params.rdf)) {
-    selectedTab.value.content = params.rdf
-    selectedTab.value.format = 'text/n3'
+  if (params.content && !Array.isArray(params.content)) {
+    selectedTab.value.content = params.content
+    selectedTab.value.format = (params.format && !Array.isArray(params.format)) ? params.format :'text/n3'
   }
 
   tabsController.listenToStorageEvents()
@@ -138,8 +138,9 @@ function loadResources(quads: QuadExt[]) {
 }
 
 function share() {
-  const datasetN3 = dataset.value.toString()
-  const url = new URL(`${document.location.protocol}//${document.location.host}/#rdf=${encodeURIComponent(datasetN3)}`)
+  const content = selectedTab.value.content
+  const format = selectedTab.value.format
+  const url = new URL(`${document.location.protocol}//${document.location.host}/#content=${encodeURIComponent(content)}&format=${encodeURIComponent(format)}`)
   shareButton.value.copyURL(url)
 }
 
