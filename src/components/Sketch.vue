@@ -16,10 +16,7 @@
           <span>/</span>
           <ZazukoLogo />
         </div>
-        <ShareUrlButton
-          ref="shareButton"
-          @share="share"
-        />
+        <ShareUrlButton ref="shareButton" @share="share" />
         <GitHubLogo />
       </div>
     </div>
@@ -104,7 +101,7 @@ const env = computed(() => ({
 }))
 
 onMounted(async () => {
-  if (params.rdf){
+  if (params.rdf && !Array.isArray(params.rdf)) {
     selectedTab.value.content = params.rdf
     selectedTab.value.format = 'text/n3'
   }
@@ -140,7 +137,7 @@ function loadResources(quads: QuadExt[]) {
   dataset.value = rdf.dataset(quads)
 }
 
-function share(){
+function share() {
   const datasetN3 = dataset.value.toString()
   const url = new URL(`${document.location.protocol}//${document.location.host}/#rdf=${encodeURIComponent(datasetN3)}`)
   shareButton.value.copyURL(url)
