@@ -18,7 +18,7 @@
     "@types/rdfjs__term-set": "^2.0.1",
     "@vueuse/core": "^9.6.0",
     "@zazuko/rdf-vocabularies": "^2023.1.19",
-    "@zazuko/vue-graph-layout": "^0.1.2",
+    "@zazuko/vue-graph-layout": "^0.1.4",
     "buffer": "^6.0.3",
     "core-js": "^3.27.2",
     "d3": "^7.8.2",
