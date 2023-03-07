@@ -44,7 +44,7 @@
       <Pane>
         <div class="flex-grow flex flex-col">
           <PaneHeader label="Representation" />
-          <GraphView class="flex-grow" :dataset="dataset" :env="env" />
+          <GraphView :dataset="dataset" :env="env" />
         </div>
       </Pane>
     </Splitpanes>
@@ -103,7 +103,7 @@ const env = computed(() => ({
 onMounted(async () => {
   if (params.content && !Array.isArray(params.content)) {
     selectedTab.value.content = params.content
-    selectedTab.value.format = (params.format && !Array.isArray(params.format)) ? params.format :'text/n3'
+    selectedTab.value.format = (params.format && !Array.isArray(params.format)) ? params.format : 'text/n3'
   }
 
   tabsController.listenToStorageEvents()
