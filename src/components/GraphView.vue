@@ -1,8 +1,6 @@
 <template>
-  <GraphLayout class="w-full h-full"
-               :layout-cfg="layoutCfg"
-               :nodes="resources" :links="links" :active-links="activeLinks" :auto-zoom="false"
-    @link-enter="onLinkHover" @link-out="onUnhover">
+  <GraphLayout class="w-full h-full" :layout-cfg="layoutCfg" :nodes="resources" :links="links" :active-links="activeLinks"
+    :auto-zoom="false" @link-enter="onLinkHover" @link-out="onUnhover">
     <template v-slot:node="{ node }">
       <ResourceCard :resource="node" :active-links="activeLinks" :env="env" @hover-title="onHoverResource"
         @unhover-title="onUnhover" @hover-property="onHoverProperty" @unhover-property="onUnhover" />
@@ -42,7 +40,7 @@ import DatasetExt from 'rdf-ext/lib/Dataset'
 import { Property, Resource } from '@/model/resource.model';
 import { Link } from '@/model/link.model'
 import { linksFromResources, resourcesFromDataset } from '@/resources-utils'
-import { CogIcon } from '@heroicons/vue/solid'
+import { CogIcon } from '@heroicons/vue/24/solid'
 
 interface Props {
   dataset: DatasetExt,
@@ -55,8 +53,8 @@ const resources = computed(() => resourcesFromDataset(props.dataset, props.env))
 const links = computed(() => linksFromResources(resources.value))
 const activeLinks = ref([])
 
-function toggleLayoutControls(){
-    showlayoutControls.value = !showlayoutControls.value
+function toggleLayoutControls() {
+  showlayoutControls.value = !showlayoutControls.value
 }
 const showlayoutControls = ref(false)
 const layoutCfg = ref({
@@ -114,9 +112,8 @@ export default {
 }
 
 .cog {
-    margin-left: auto;
-    margin-right: 0;
-    color: #8a9ba1;
+  margin-left: auto;
+  margin-right: 0;
+  color: #8a9ba1;
 }
-
 </style>

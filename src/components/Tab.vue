@@ -18,7 +18,6 @@
             <XCircleIcon class="w-4 h-4 text-gray-500 hover:text-gray-700" />
         </button>
     </div>
-
 </template>
 
 <script setup lang="ts">
@@ -27,7 +26,7 @@
 import { Tab } from '@/model/tab.model';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-import { XCircleIcon } from '@heroicons/vue/outline'
+import { XCircleIcon } from '@heroicons/vue/24/outline'
 
 import { ref } from 'vue'
 
