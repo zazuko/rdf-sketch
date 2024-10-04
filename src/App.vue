@@ -16,6 +16,8 @@ import type { RdfFormat } from './constant/rdf-format';
 import GraphView from './components/GraphView.vue';
 import type { Dataset } from '@rdfjs/types';
 
+import { prefixMap } from './rdf/prefix-map'; 
+
 
 const selectedFormat = ref<RdfFormat>(rdfFormats.find(f => f.type === RdfSerializationType.Turtle) ?? rdfFormats[0]);
 const rdfFormatOptions = ref<RdfFormat[]>(rdfFormats);
@@ -27,11 +29,10 @@ const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 const hideEditorSplitterPanel = ref(false);
 
 function onQuadsChanged(rdfData: RdfData) {
-  console.log('Quads changed');
-  const newDataset = rdfEnvironment.dataset(rdfData.quads);
-  dataset.value = newDataset as unknown as Dataset;
+  const newDataset = rdfEnvironment.dataset(rdfData.quads) as unknown as  Dataset;
+  prefixMap.update(rdfData.prefix);
+  dataset.value = newDataset;
 }
-
 function makeEditorSmall() {
   hideEditorSplitterPanel.value = true
 }

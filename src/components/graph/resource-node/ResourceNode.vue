@@ -2,19 +2,37 @@
 
 import type { Resource } from '@/model/resource.model';
 import type { NodeProps } from '@vue-flow/core'  
-import { Handle, Position } from '@vue-flow/core'
+import { Handle, Position, useVueFlow } from '@vue-flow/core'
 
-import Term from '../../Term.vue'
+import RdfTerm from '../../RdfTerm.vue'
+import type { Term } from '@rdfjs/types';
+
+const { fitView, nodeLookup} = useVueFlow()
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 const props = defineProps<NodeProps<{resource: Resource, env: any}>>()
 
+
+function zoomToNode(term: Term) {
+  if (!(term.termType === 'NamedNode' || term.termType === 'BlankNode')) {
+    return
+  }
+  const node = nodeLookup.value.get(term.value);
+  if (!node) {
+    return
+  }
+	fitView({
+		nodes: [node.id],
+		duration: 1000, // use this if you want a smooth transition to the node
+		padding: 0.3 // use this for some padding around the node
+	})
+}
 </script>
 
 <template>
   <div style="position: relative;">
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-      <Handle type="target" :position="Position.Left"  style="opacity: 0"/>
+      <Handle type="target"   style="opacity: 1"/>
 
     </div>
 <div class="resource-card">
@@ -37,12 +55,12 @@ const props = defineProps<NodeProps<{resource: Resource, env: any}>>()
         <!--    <TermTooltip :label="property.id">
             {{ property.name }}
           </TermTooltip> -->
-          {{ property.name }}
+          {{  property.name }}
         </th>
 
         <td class="object">
-          <div v-for="value in property.values" :key="value.value">
-            <Term :term="value" :env="props.data.env" />
+          <div v-for="value in property.values" :key="value.value" @dblclick="zoomToNode(value)">
+            <RdfTerm  :term="value" :env="props.data.env" />
             <Handle  v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0"/>
             <Handle  v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source"  :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0" />
           </div>

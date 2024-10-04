@@ -13,6 +13,7 @@ export interface RdfData {
     quads: Quad[];
     rdfText: string;
     serializationFormat: RdfSerializationType;
+    prefix: RdfPrefix[];
   }
 
 export interface RdfPrefix {
@@ -39,8 +40,6 @@ const currentSerialization = ref<RdfSerializationType>(RdfSerializationType.Turt
 
 watch(() => props.format, (newFormat) => {
   if (newFormat !== currentSerialization.value) {
-    console.log('Format changed', newFormat);
-
     currentSerialization.value = newFormat;
   }
 });
@@ -60,6 +59,7 @@ function onQuadsChanged(e: CustomEvent) {
       quads: quads,
       rdfText: text,
       serializationFormat: props.format,
+      prefix: prefixList.value
   };
     localStorage.setItem(localStorageKeyText, rdfData.rdfText);
     localStorage.setItem(localStorageKeyFormat, rdfData.serializationFormat);

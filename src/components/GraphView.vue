@@ -15,9 +15,9 @@
 
 import { computed, ref, watch, nextTick } from 'vue'
 
-import type {  Resource } from '@/model/resource.model';
+import type { Resource } from '@/model/resource.model';
 import type {  Link } from '@/model/link.model';
-import type {  Dataset } from '@rdfjs/types';
+import type { Dataset } from '@rdfjs/types';
 import { linksFromResources, resourcesFromDataset } from '../resources-utils';
 
 // vue-flow
@@ -50,7 +50,7 @@ const props = defineProps<GraphViewProps>()
 const { elkLayout } = useLayout()
 const { fitView, nodeLookup } = useVueFlow()
 
-const resources = computed(() => resourcesFromDataset(props.dataset, props.env))
+const resources = computed(() => resourcesFromDataset(props.dataset))
 const links = computed(() => linksFromResources(resources.value))
 
 const nodes = ref<CustomNode[]>([])

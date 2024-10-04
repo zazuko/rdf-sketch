@@ -2,9 +2,10 @@ import TermSet from "@rdfjs/term-set"
 import type { Link } from "./model/link.model"
 import type { Resource } from "./model/resource.model"
 import { rdfEnvironment } from './rdf/environment';
+import { shrinkTerm } from "./rdf/shrink-term";
 
 
-export function resourcesFromDataset(dataset: any, env: any): Resource[] {
+export function resourcesFromDataset(dataset: any): Resource[] {
     const extractedSubjects = [...dataset].map(quad => quad.subject)
     const extractedObject = [...dataset].filter(
         quad => !quad.predicate.equals(rdfEnvironment.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))).map(quad => quad.object).filter(o => o.termType === "BlankNode" || o.termType === "NamedNode")
@@ -18,7 +19,7 @@ export function resourcesFromDataset(dataset: any, env: any): Resource[] {
                 const property = {
                     id: predicate.value,
                     term: predicate,
-                    name: predicate.value, // env.shrink(predicate),
+                    name: shrinkTerm(predicate),
                     values: new TermSet(),
                 }
                 acc.set(predicate.value, property)
@@ -30,7 +31,7 @@ export function resourcesFromDataset(dataset: any, env: any): Resource[] {
         return {
             id: node.value,
             term: node,
-            name: node.value,//env.shrink(node),
+            name: shrinkTerm(node),
             properties: [...properties.values()]
         } as Resource
     })
