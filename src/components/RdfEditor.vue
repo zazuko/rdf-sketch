@@ -7,6 +7,7 @@ import {rdfFormats, RdfSerializationType} from '../constant/rdf-format';
 
 import type { Quad} from '@rdfjs/types';
 import { localStorageKeyFormat, localStorageKeyPrefixList, localStorageKeyText } from '@/constant/local-storage-keys';
+import { MAX_TRIPLES_TO_BE_STORED } from '@/constant/min-max';
 
 
 export interface RdfData {
@@ -61,10 +62,12 @@ function onQuadsChanged(e: CustomEvent) {
       serializationFormat: props.format,
       prefix: prefixList.value
   };
+
+  if (quads.length < MAX_TRIPLES_TO_BE_STORED) {
     localStorage.setItem(localStorageKeyText, rdfData.rdfText);
     localStorage.setItem(localStorageKeyFormat, rdfData.serializationFormat);
-    // store prefix list
     localStorage.setItem(localStorageKeyPrefixList, JSON.stringify(prefixList.value));
+  }
     emit('change', rdfData);
   }
  

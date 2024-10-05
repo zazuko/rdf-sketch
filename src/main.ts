@@ -24,4 +24,3 @@ app.directive('tooltip', Tooltip);
 
 app.mount('#app')
 
-localStorage.clear();

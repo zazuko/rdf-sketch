@@ -115,6 +115,3 @@ function onNdeSelected(term: Term) {
 
 </template>
 
-<style scoped>
-
-</style>

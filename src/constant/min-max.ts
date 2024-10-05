@@ -1,0 +1,1 @@
+export const MAX_TRIPLES_TO_BE_STORED = 5000;
