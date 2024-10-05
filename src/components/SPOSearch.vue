@@ -1,39 +1,39 @@
 <template>
-    
- <h1>SPO</h1>
-
-<DataTable  v-model:filters="filters" filterDisplay="row" :value="spo"   tableStyle="min-width: 50rem">
-    <Column field="subject" header="Subject">  
+<DataTable  v-model:filters="filters" filterDisplay="row" :value="spo" scrollable scrollHeight="flex"  tableStyle="min-width: 50rem;">
+    <Column field="subject" header="Subject" style="width: 20%">  
         <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Subject" />
         </template>
         <template #body="{ data }">
-            <span @click="nodeSelected(data.subjectTerm)">
+            <span @click="nodeSelected(data.subjectTerm)" class="node-link">
                 {{ data.subject }}
             </span>
         </template>
     </Column>
-    <Column field="predicate" header="Predicate">
+    <Column field="predicate" header="Predicate" style="width: 20%">
         <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Predicate" />
         </template>
         <template #body="{ data }">
-            <span @click="nodeSelected(data.subjectTerm)">
+            <span @click="nodeSelected(data.subjectTerm)" class="node-link">
                 {{ data.predicate }}
             </span>
         </template>
     </Column>
-    <Column field="object" header="Object">
+    <Column field="object" header="Object"  style="width: 20%">
         <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Object" />
         </template>
         <template #body="{ data }">
-            <span @click="nodeSelected(data.objectTerm)">
+            <span v-if="data.predicateTerm.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' || data.objectTerm.termType === 'Literal'">
+                {{ data.object }}
+            </span>
+            <span v-else @click="nodeSelected(data.objectTerm)" class="node-link">
                 {{ data.object }}
             </span>
         </template>
     </Column>
-    <Column v-if="hasContext" field="context" header="Context">
+    <Column v-if="hasContext" field="context" header="Context" style="width: 20%">
         <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Context aka Named Graph" />
         </template>
@@ -83,7 +83,7 @@ const spo = computed<SPO[]>(() => {
             subject:  shrinkTerm( quad.subject),
             subjectTerm: quad.subject,
             predicate: shrinkTerm( quad.predicate),
-            predicateTerm: quad.subject,
+            predicateTerm: quad.predicate,
             object: shrinkTerm(quad.object),
             objectTerm: quad.object,
             context: quad.graph.value
@@ -111,34 +111,16 @@ function nodeSelected(term: Term) {
 
 </script>
 
-<style>
+<style scoped>
 
-/* these are necessary styles for vue flow */
-@import '@vue-flow/core/dist/style.css';
-
-/* this contains the default theme, these are optional styles */
-@import '@vue-flow/core/dist/theme-default.css';
-#menu {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: white;
-  border: 1px solid black;
-  padding: 10px;
-  pointer-events: auto;
+span {
+    font-size: 12px;
 }
 
-.control {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-}
+.node-link {
+    cursor: pointer;
+    text-decoration: underline;
 
-.cog {
-  margin-left: auto;
-  margin-right: 0;
-  color: #8a9ba1;
 }
 
 </style>
