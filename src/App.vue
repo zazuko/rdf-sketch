@@ -104,7 +104,7 @@ function onNdeSelected(term: Term) {
     <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
       <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="onFormatChange"/>
     </SplitterPanel>
-    <SplitterPanel class="flex items-center justify-center niceBg">
+    <SplitterPanel class="flex items-center justify-center">
       <GraphView :dataset="dataset" :env="env" />
     </SplitterPanel>
     <SplitterPanel v-if="!hideSearchPanel">
@@ -117,8 +117,4 @@ function onNdeSelected(term: Term) {
 
 <style scoped>
 
-.niceBg {
-  background-color: #2b2926;
-  background-image: linear-gradient(62deg, #2b2926 0%, #1a1a6a 50%, #131152 100%);
-}
 </style>
