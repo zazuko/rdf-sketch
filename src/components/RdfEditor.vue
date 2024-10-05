@@ -44,7 +44,7 @@ watch(() => props.format, (newFormat) => {
   }
 });
 
-const rdfText = ref<string>('foo');
+const rdfText = ref<string>('');
 
 function onParsingFailed(e: CustomEvent) {
   console.error('Parsing failed', e.detail);
