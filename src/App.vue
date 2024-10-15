@@ -6,6 +6,7 @@ import Button from 'primevue/button';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Select from 'primevue/select';
+import Dialog from 'primevue/dialog';
 
 
 import RdfEditor from './components/RdfEditor.vue';
@@ -32,7 +33,7 @@ const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 
 const hideEditorSplitterPanel = ref(false);
 const hideSearchPanel = ref(true);
-
+const showConfigDialog = ref(false);
 
 function onQuadsChanged(rdfData: RdfData) {
   const newDataset = rdfEnvironment.dataset(rdfData.quads) as unknown as  Dataset;
@@ -94,6 +95,8 @@ function onNdeSelected(term: Term) {
     </template>
 
     <template #end>
+      <Button icon="pi pi-cog" class="mr-2" severity="secondary" @click="showConfigDialog = true" text />
+
       <Button icon="pi pi-search" class="mr-2" severity="secondary" @click="toggleSearch" text />
 
       <Button as="a" icon="pi pi-github" class="mr-2" severity="secondary" href="https://github.com/zazuko/rdf-sketch"
@@ -111,6 +114,25 @@ function onNdeSelected(term: Term) {
       <SPOSearch :dataset="dataset" @selected="onNdeSelected"/>
     </SplitterPanel>
   </Splitter>
+
+
+
+  <Dialog v-model:visible="showConfigDialog" modal header="Edit Profile" :style="{ width: '25rem' }">
+    <span class="text-surface-500 dark:text-surface-400 block mb-8">Update your information.</span>
+    <div class="flex items-center gap-4 mb-4">
+        <label for="username" class="font-semibold w-24">Username</label>
+        <InputText id="username" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex items-center gap-4 mb-8">
+        <label for="email" class="font-semibold w-24">Email</label>
+        <InputText id="email" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex justify-end gap-2">
+        <Button type="button" label="Cancel" severity="secondary" @click="showConfigDialog = false"></Button>
+        <Button type="button" label="Save" @click="showConfigDialog = false"></Button>
+    </div>
+</Dialog>
+
 
 
 </template>

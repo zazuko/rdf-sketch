@@ -53,3 +53,4 @@ export interface RdfFormat {
     name: string;
     type: RdfSerializationType;
 }
+
