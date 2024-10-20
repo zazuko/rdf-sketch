@@ -32,7 +32,7 @@ function zoomToNode(term: Term) {
 <template>
   <div style="position: relative;">
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-      <Handle type="target"   style="opacity: 1"/>
+      <Handle type="target"   style="opacity: 0"/>
 
     </div>
 <div class="resource-card">

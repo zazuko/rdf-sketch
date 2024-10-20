@@ -12,7 +12,7 @@ export function resourcesFromDataset(dataset: any): Resource[] {
 
     const nodeSet = new TermSet([...extractedSubjects, ...extractedObject])
 
-    return [...nodeSet].map(node => {
+    const resources = [...nodeSet].map(node => {
         const quads = dataset.match(node)
         const properties = [...quads].reduce((acc, { predicate, object }) => {
             if (!acc.has(predicate.value)) {
@@ -34,7 +34,9 @@ export function resourcesFromDataset(dataset: any): Resource[] {
             name: shrinkTerm(node),
             properties: [...properties.values()]
         } as Resource
-    })
+    });
+    console.log(resources)
+    return resources
 }
 
 
@@ -43,12 +45,13 @@ export function linksFromResources(resources: Resource[]): Link[] {
         return resource.term
     }))
 
-    return resources
+    const links = resources
         .flatMap(resource => resource.properties.map(property => {
             return ({ ...property, resource })
         }))
         .reduce((links: Link[], property) => {
             property.values.forEach((value) => {
+                debugger;
                 const source = property.resource.term
                 const target = value
                 if (resourceIds.has(target)) {
@@ -63,4 +66,6 @@ export function linksFromResources(resources: Resource[]): Link[] {
             return links
         },
             []);
+    console.log(links)
+    return links
 }
