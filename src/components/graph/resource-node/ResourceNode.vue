@@ -61,8 +61,8 @@ function zoomToNode(term: Term) {
         <td class="object">
           <div v-for="value in property.values" :key="value.value" @dblclick="zoomToNode(value)">
             <RdfTerm  :term="value" :env="props.data.env" />
-            <Handle  v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0"/>
-            <Handle  v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source"  :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0" />
+            <Handle  v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 1"/>
+            <Handle  v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source"  :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 1" />
           </div>
         </td>
          

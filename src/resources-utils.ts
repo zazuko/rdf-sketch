@@ -51,7 +51,6 @@ export function linksFromResources(resources: Resource[]): Link[] {
         }))
         .reduce((links: Link[], property) => {
             property.values.forEach((value) => {
-                debugger;
                 const source = property.resource.term
                 const target = value
                 if (resourceIds.has(target)) {

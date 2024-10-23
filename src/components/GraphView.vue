@@ -1,14 +1,22 @@
 <template>
-    
+     <svg style="height: 0; width: 0;">
+          <defs>
+        <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+          <circle cx="5" cy="5" r="5" fill="red" />
+        </marker>
+      </defs>
+      </svg>
     <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.05" :max-zoom="10" @node-drag="onNodeDrag" >
       <template #node-custom="customNodeProps">
       <ResourceNode v-bind="customNodeProps" />
+    </template>
+    <template #edge-custom="customEdgeProps">
+      <FloatingEdge v-bind="customEdgeProps" />
     </template>
   <!-- <MiniMap pannable zoomable />--> 
     <Controls />
    
   </VueFlow>
-
 </template>
 
 <script setup lang="ts">
@@ -19,9 +27,9 @@ import type { Resource } from '@/model/resource.model';
 import type {  Link } from '@/model/link.model';
 import type { Dataset } from '@rdfjs/types';
 import { linksFromResources, resourcesFromDataset } from '../resources-utils';
-
+import FloatingEdge from './graph/floating-edge/FloatingEdge.vue';
 // vue-flow
-import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent} from '@vue-flow/core'
+import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent, MarkerType} from '@vue-flow/core'
 // import { MiniMap } from '@vue-flow/minimap'
 import { Controls } from '@vue-flow/controls'
 
@@ -37,6 +45,10 @@ import ResourceNode  from './graph/resource-node/ResourceNode.vue'
 
 type CustomNodeTypes = 'custom' | 'special'
 type CustomNode = Node<Resource, {}, CustomNodeTypes>
+
+type CustomEdgeTypes = 'custom' | 'special'
+
+type CustomEdge = Edge<any, any, CustomEdgeTypes>
 
 
 interface GraphViewProps {
@@ -54,7 +66,7 @@ const resources = computed(() => resourcesFromDataset(props.dataset))
 const links = computed(() => linksFromResources(resources.value))
 
 const nodes = ref<CustomNode[]>([])
-const edges = ref<Edge<Link>[]>([])
+const edges = ref<CustomEdge[]>([])
 
 watch(resources, async (newResources) => {
   const nodesWithoutLayout = newResources.map(resource => ({
@@ -72,13 +84,16 @@ watch(resources, async (newResources) => {
     source: link.source,
     target: link.target,
     sourceHandle: `${link.source}-${link.sourceProperty}-right`,
-    animated: true,
+    animated: false,
     data: link,
+    type: 'custom',
+    markerEnd: MarkerType.ArrowClosed,
+    markerStart: 'dot',
   }));
 
   const layoutedStuff = await elkLayout(nodesWithoutLayout, newEdges);
   nodes.value = (layoutedStuff as any).nodes as unknown as CustomNode[];
-  edges.value = (layoutedStuff as any).edges as unknown as Edge[];
+  edges.value = (layoutedStuff as any).edges as unknown as CustomEdge[];
 
   await nextTick();
   fitView();
