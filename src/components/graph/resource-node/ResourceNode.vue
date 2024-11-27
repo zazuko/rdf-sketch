@@ -30,11 +30,12 @@ function zoomToNode(term: Term) {
 </script>
 
 <template>
-  <div style="position: relative;">
+  <div >
+    <!--
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
       <Handle type="target"   style="opacity: 0"/>
 
-    </div>
+    </div>-->
 <div class="resource-card">
 
     <header class="resource-card-header">
@@ -48,26 +49,32 @@ function zoomToNode(term: Term) {
       </h3>
      
     </header>
-    <table>
-      <tr v-for="(property, index) in props.data.resource.properties" :key="index" :data-id="property.id" class="table-row">
-      
-        <th class="predicate">
+    <div class="table-container">
+    <div v-for="(property, index) in props.data.resource.properties" :key="index" :data-id="property.id" class="table-row">
+      <div>
+        <div v-for="value in property.values" :key="value.value" style="position: relative;">
+          <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0" />
+        </div>
+
+      </div>
+      <div class="predicate">
         <!--    <TermTooltip :label="property.id">
             {{ property.name }}
           </TermTooltip> -->
-          {{  property.name }}
-        </th>
+        {{ property.name }}
+      </div>
 
-        <td class="object">
-          <div v-for="value in property.values" :key="value.value" @dblclick="zoomToNode(value)">
-            <RdfTerm  :term="value" :env="props.data.env" />
-            <Handle  v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 1"/>
-            <Handle  v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source"  :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 1" />
-          </div>
-        </td>
+      <div class="object">
+        <div v-for="value in property.values" :key="value.value" @dblclick="zoomToNode(value)">
+          <RdfTerm :term="value" :env="props.data.env" />
+        </div>
+      </div>
+      <div v-for="value in property.values" :key="value.value" style="position: relative;">
+        <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0;" />
+      </div>
          
-      </tr>
-    </table>
+    </div>
+  </div>
 </div>
   </div>
 </template>
@@ -114,6 +121,29 @@ tr {
 }
 tr:not(:last-child) {
   border-bottom: 1px solid lightgray !important;
+}
+
+.table-container {
+  display: table;
+  width: 100%;
+}
+
+.table-row {
+  display: table-row;
+  position: relative !important;
+  border-bottom: 1px solid gray;
+  right: 0;
+  top: 0;
+}
+
+.predicate, .object {
+  display: table-cell;
+  padding: 8px;
+  
+  text-align: left;
+  color: black;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .predicate {

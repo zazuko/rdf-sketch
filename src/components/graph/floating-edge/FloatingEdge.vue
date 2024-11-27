@@ -39,7 +39,9 @@ const newEdgePath = computed(
     if(!edgeParams.value.sx) {
       return '';
     }
-    const sx = props.sourceX;
+
+    
+    const sx = props.sourceX // < props.targetX ? props.sourceX  - 3 : props.sourceX + 3;
     const sy = props.sourceY;
     const sourcePos = props.sourcePosition;
       return getBezierPath({
@@ -55,5 +57,14 @@ const newEdgePath = computed(
 </script>
 
 <template>
+    <line
+    x1="10"
+    y1="10"
+    x2="90"
+    y2="90"
+    stroke="black"
+    marker-end="url(#logo)" />
+
   <BaseEdge :id="id" :path="newEdgePath[0]" :marker-start="markerStart" :marker-end="markerEnd" :style="style" />
+ 
 </template>

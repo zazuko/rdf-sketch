@@ -3,9 +3,10 @@ import type { Link } from "./model/link.model"
 import type { Resource } from "./model/resource.model"
 import { rdfEnvironment } from './rdf/environment';
 import { shrinkTerm } from "./rdf/shrink-term";
+import type { Dataset } from "@rdfjs/types";
 
 
-export function resourcesFromDataset(dataset: any): Resource[] {
+export function resourcesFromDataset(dataset: Dataset): Resource[] {
     const extractedSubjects = [...dataset].map(quad => quad.subject)
     const extractedObject = [...dataset].filter(
         quad => !quad.predicate.equals(rdfEnvironment.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))).map(quad => quad.object).filter(o => o.termType === "BlankNode" || o.termType === "NamedNode")
@@ -35,7 +36,7 @@ export function resourcesFromDataset(dataset: any): Resource[] {
             properties: [...properties.values()]
         } as Resource
     });
-    console.log(resources)
+    console.log('resource from dataset ')
     return resources
 }
 

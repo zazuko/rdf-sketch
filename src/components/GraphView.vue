@@ -1,12 +1,23 @@
 <template>
-     <svg style="height: 0; width: 0;">
-          <defs>
-        <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
-          <circle cx="5" cy="5" r="5" fill="red" />
-        </marker>
-      </defs>
+   <svg :style="{ position: 'absolute', top: 0, left: 0 }">
+        <defs>
+          <marker
+            id="logo"
+             viewBox="0 0 10 10"
+      refX="5"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" style="stroke: red; fill: red" />
+
+          </marker>
+
+        </defs>
       </svg>
+   
     <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.05" :max-zoom="10" @node-drag="onNodeDrag" >
+   
       <template #node-custom="customNodeProps">
       <ResourceNode v-bind="customNodeProps" />
     </template>
@@ -58,17 +69,33 @@ interface GraphViewProps {
 
 const props = defineProps<GraphViewProps>()
 
+// Debugging: Log props.dataset to ensure it's reactive
+console.log('props.dataset', props.dataset);
 
 const { elkLayout } = useLayout()
 const { fitView, nodeLookup } = useVueFlow()
 
-const resources = computed(() => resourcesFromDataset(props.dataset))
-const links = computed(() => linksFromResources(resources.value))
+const resources = computed(() => {
+  const res = resourcesFromDataset(props.dataset);
+  // Debugging: Log resources to ensure it's reactive
+  console.log('computed resources', res);
+  return res;
+});
+
+const links = computed(() => {
+  const lks = linksFromResources(resources.value);
+  // Debugging: Log links to ensure it's reactive
+  console.log('computed links', lks);
+  return lks;
+});
 
 const nodes = ref<CustomNode[]>([])
 const edges = ref<CustomEdge[]>([])
 
 watch(resources, async (newResources) => {
+  // Debugging: Log when watch is triggered
+  console.log('watch triggered', newResources);
+
   const nodesWithoutLayout = newResources.map(resource => ({
     id: resource.id,
     type: 'custom',
@@ -87,14 +114,16 @@ watch(resources, async (newResources) => {
     animated: false,
     data: link,
     type: 'custom',
-    markerEnd: MarkerType.ArrowClosed,
-    markerStart: 'dot',
+    markerEnd: 'logo',
+    markerStart: 'logo',
   }));
 
   const layoutedStuff = await elkLayout(nodesWithoutLayout, newEdges);
   nodes.value = (layoutedStuff as any).nodes as unknown as CustomNode[];
   edges.value = (layoutedStuff as any).edges as unknown as CustomEdge[];
 
+  console.log('nodes', nodes.value);
+  console.log('edges', edges.value);
   await nextTick();
   fitView();
 });
