@@ -31,49 +31,41 @@ function zoomToNode(term: Term) {
 
 <template>
   <div >
-    <!--
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-      <Handle type="target"   style="opacity: 0"/>
+    <div class="resource-card">
 
-    </div>-->
-<div class="resource-card">
+      <header class="resource-card-header">
 
-    <header class="resource-card-header">
-
-      <h3 class="resource-title">
-       <!--<TermTooltip :label="props.data.resource.id">
+        <h3 class="resource-title">
+        <!--<TermTooltip :label="props.data.resource.id">
+            {{ props.data.resource.name }}
+          </TermTooltip>--> 
           {{ props.data.resource.name }}
-        </TermTooltip>--> 
-        {{ props.data.resource.name }}
 
-      </h3>
-     
-    </header>
-    <div class="table-container">
-    <div v-for="(property, index) in props.data.resource.properties" :key="index" :data-id="property.id" class="table-row">
-      <div>
+        </h3>
+      
+      </header>
+      <div class="table-container">
+         <div v-for="(property, index) in props.data.resource.properties" :key="index" :data-id="property.id" class="table-row">
+         <div>
+          <div v-for="value in property.values" :key="value.value" style="position: relative;">
+            <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0" />
+          </div>
+        </div>
+        <div class="predicate">
+          {{ property.name }}
+        </div>
+
+        <div class="object">
+          <div v-for="value in property.values" :key="value.value" @click="zoomToNode(value)">
+            <RdfTerm :term="value" :env="props.data.env" />
+          </div>
+        </div>
+
         <div v-for="value in property.values" :key="value.value" style="position: relative;">
-          <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0" />
+          <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0;" />
         </div>
-
+          
       </div>
-      <div class="predicate">
-        <!--    <TermTooltip :label="property.id">
-            {{ property.name }}
-          </TermTooltip> -->
-        {{ property.name }}
-      </div>
-
-      <div class="object">
-        <div v-for="value in property.values" :key="value.value" @dblclick="zoomToNode(value)">
-          <RdfTerm :term="value" :env="props.data.env" />
-        </div>
-      </div>
-      <div v-for="value in property.values" :key="value.value" style="position: relative;">
-        <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0;" />
-      </div>
-         
-    </div>
   </div>
 </div>
   </div>
@@ -87,7 +79,7 @@ function zoomToNode(term: Term) {
 .resource-card {
   border-radius: 5px;
   background-color: white;
-  box-shadow: 0 4px 6px rgba(199, 188, 188, 0.1);
+  box-shadow: 0 4px 6px rgba(107, 107, 107, 0.8);
   min-width: 500px;
 
   

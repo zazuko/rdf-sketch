@@ -3,7 +3,6 @@ import './assets/main.css'
 import { createApp } from 'vue'
 
 import PrimeVue from 'primevue/config'
-import Tooltip from 'primevue/tooltip';
 
 import Aura from '@primevue/themes/aura'
 import App from './App.vue'
@@ -19,8 +18,6 @@ app.use(PrimeVue, {
         cssLayer: false
     }
 });
-
-app.directive('tooltip', Tooltip);
 
 app.mount('#app')
 

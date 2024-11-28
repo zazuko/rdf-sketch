@@ -8,7 +8,6 @@ import SplitterPanel from 'primevue/splitterpanel';
 import Select from 'primevue/select';
 import Dialog from 'primevue/dialog';
 
-
 import RdfEditor from './components/RdfEditor.vue';
 import type {  RdfData } from './components/RdfEditor.vue';
 import { rdfEnvironment } from './rdf/environment';
@@ -23,17 +22,13 @@ import { useVueFlow } from '@vue-flow/core';
 
 const { fitView, nodeLookup} = useVueFlow()
 
-
 const selectedFormat = ref<RdfFormat>(rdfFormats.find(f => f.type === RdfSerializationType.Turtle) ?? rdfFormats[0]);
 const rdfFormatOptions = ref<RdfFormat[]>(rdfFormats);
-
 const currentSerialization = computed(() => selectedFormat.value.type);
-
 const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
-
 const hideEditorSplitterPanel = ref(false);
 const hideSearchPanel = ref(true);
-const showConfigDialog = ref(false);
+const showAboutDialog = ref(false);
 
 function onQuadsChanged(rdfData: RdfData) {
   const newDataset = rdfEnvironment.dataset(rdfData.quads) as unknown as  Dataset;
@@ -52,12 +47,9 @@ function toggleSearch () {
 }
 
 function onFormatChange(rdfSerializationType: RdfSerializationType) {
-  console.log('Format changed', rdfSerializationType);
   const newFormat = rdfFormats.find(f => f.type === rdfSerializationType) ?? rdfFormats[0];
   selectedFormat.value = newFormat;
 }
-
-
 
 
 const env = rdfEnvironment;
@@ -84,10 +76,9 @@ function onNdeSelected(term: Term) {
   <Toolbar>
     <template #start>
 
-      <Button v-if="!hideEditorSplitterPanel" icon="pi pi-arrow-left" class="mr-2" severity="secondary" @click="makeEditorSmall" text />
-      <Button v-if="hideEditorSplitterPanel" icon="pi pi-arrow-right" class="mr-2" severity="secondary" @click="makeEditorBig" text />
-      <Select v-model="selectedFormat" :options="rdfFormatOptions" optionLabel="name" placeholder="Select RDF Serialization" checkmark :highlightOnSelect="false" />
-
+      <Button v-if="!hideEditorSplitterPanel" icon="pi pi-file-edit" class="mr-2" severity="secondary" @click="makeEditorSmall" text ></Button>
+      <Button v-if="hideEditorSplitterPanel" icon="pi pi-file-edit" class="mr-2" severity="secondary" @click="makeEditorBig" text ></Button>
+      <Select v-model="selectedFormat" :options="rdfFormatOptions" optionLabel="name" placeholder="Select RDF Serialization" checkmark :highlightOnSelect="false"></Select>
     </template>
 
     <template #center>
@@ -95,14 +86,14 @@ function onNdeSelected(term: Term) {
     </template>
 
     <template #end>
-      <Button icon="pi pi-cog" class="mr-2" severity="secondary" @click="showConfigDialog = true" text />
 
-      <Button icon="pi pi-search" class="mr-2" severity="secondary" @click="toggleSearch" text />
-
+      <Button icon="pi pi-search" class="mr-2" severity="secondary" @click="toggleSearch" text></Button>
+      <Button icon="pi pi-lightbulb" class="mr-2" severity="secondary" @click="showAboutDialog = !showAboutDialog" text></Button>
       <Button as="a" icon="pi pi-github" class="mr-2" severity="secondary" href="https://github.com/zazuko/rdf-sketch"
-        target="_blank" />
+        target="_blank"></Button>
     </template>
   </Toolbar>
+
   <Splitter style="height: calc(100vh - (67.5px + ( 2 * 8px) + 8px) ); margin-top: 8px" class="mb-8">
     <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
       <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="onFormatChange"/>
@@ -117,20 +108,29 @@ function onNdeSelected(term: Term) {
 
 
 
-  <Dialog v-model:visible="showConfigDialog" modal header="Edit Profile" :style="{ width: '25rem' }">
-    <span class="text-surface-500 dark:text-surface-400 block mb-8">Update your information.</span>
-    <div class="flex items-center gap-4 mb-4">
-        <label for="username" class="font-semibold w-24">Username</label>
-        <InputText id="username" class="flex-auto" autocomplete="off" />
+  <Dialog v-model:visible="showAboutDialog" modal header="Zazuko Sketch" :style="{ width: '60rem' }">
+    <span class="mb-8"></span>
+    <div style="opacity: 0.8;" >
+Sketch is a simple yet powerful tool for visualizing RDF graphs. It allows you to:
+
+<ul>
+  <li>
+    Traverse and Explore: Seamlessly navigate through your RDF graphs.
+  </li>
+  <li>
+    Search with Ease:Quickly locate nodes and connections.
+  </li>
+  <li>
+    Interact Intuitively: Click on edges to reach their source nodes or on objects to explore the target of an edge.
+  </li>
+</ul>
+<br>
+<br>
+
+With Sketch, working with RDF data becomes both accessible and efficient, making it easier to explore and understand complex relationships
     </div>
-    <div class="flex items-center gap-4 mb-8">
-        <label for="email" class="font-semibold w-24">Email</label>
-        <InputText id="email" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex justify-end gap-2">
-        <Button type="button" label="Cancel" severity="secondary" @click="showConfigDialog = false"></Button>
-        <Button type="button" label="Save" @click="showConfigDialog = false"></Button>
-    </div>
+    <br>
+   
 </Dialog>
 
 

@@ -1,22 +1,16 @@
 <template>
-   <svg :style="{ position: 'absolute', top: 0, left: 0 }">
-        <defs>
-          <marker
-            id="logo"
-             viewBox="0 0 10 10"
-      refX="5"
-      refY="5"
-      markerWidth="6"
-      markerHeight="6"
-      orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" style="stroke: red; fill: red" />
-
+   <svg style="height: 0; width: 0;">
+        <defs>        
+          <marker id="big-arrow" class="vue-flow__arrowhead" viewBox="-10 -10 20 20" refX="0" refY="0" markerWidth="12.5" markerHeight="12.5" markerUnits="strokeWidth" orient="auto-start-reverse">
+          <polyline stroke-linecap="round" stroke-linejoin="round" fill="rgb(177, 177, 183)" points="-10,-8 0,0 -10, 8, -10,-8" style="stroke: rgb(177, 177, 183); stroke-width: 1;"></polyline>
           </marker>
-
+          <marker id="circle" class="vue-flow__arrowhead" viewBox="-10 -10 20 20" refX="0" refY="0" markerWidth="12.5" markerHeight="12.5" markerUnits="strokeWidth" orient="auto-start-reverse">
+          <circle stroke-linecap="round" stroke-linejoin="round" fill="rgb(177, 177, 183)" rx="0" ry="0" r="5" style="stroke: rgb(177, 177, 183); stroke-width: 1;"></circle>
+          </marker>
         </defs>
-      </svg>
+    </svg>
    
-    <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.05" :max-zoom="10" @node-drag="onNodeDrag" >
+    <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.05" :max-zoom="10" @node-drag="onNodeDrag" @edge-click="zoomToNode" >
    
       <template #node-custom="customNodeProps">
       <ResourceNode v-bind="customNodeProps" />
@@ -24,7 +18,7 @@
     <template #edge-custom="customEdgeProps">
       <FloatingEdge v-bind="customEdgeProps" />
     </template>
-  <!-- <MiniMap pannable zoomable />--> 
+    <MiniMap pannable zoomable />
     <Controls />
    
   </VueFlow>
@@ -35,32 +29,24 @@
 import { computed, ref, watch, nextTick } from 'vue'
 
 import type { Resource } from '@/model/resource.model';
-import type {  Link } from '@/model/link.model';
 import type { Dataset } from '@rdfjs/types';
 import { linksFromResources, resourcesFromDataset } from '../resources-utils';
 import FloatingEdge from './graph/floating-edge/FloatingEdge.vue';
-// vue-flow
-import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent, MarkerType} from '@vue-flow/core'
-// import { MiniMap } from '@vue-flow/minimap'
-import { Controls } from '@vue-flow/controls'
 
-import '@vue-flow/minimap/dist/style.css'
-import '@vue-flow/controls/dist/style.css'
+import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent} from '@vue-flow/core';
+import { MiniMap } from '@vue-flow/minimap';
+import { Controls } from '@vue-flow/controls';
+import '@vue-flow/minimap/dist/style.css';
+import '@vue-flow/controls/dist/style.css';
 
-// the layout function
 import { useLayout } from '../layout/use-layout'; 
-
-// custom nodes 
 import ResourceNode  from './graph/resource-node/ResourceNode.vue'
 
 
 type CustomNodeTypes = 'custom' | 'special'
 type CustomNode = Node<Resource, {}, CustomNodeTypes>
-
 type CustomEdgeTypes = 'custom' | 'special'
-
 type CustomEdge = Edge<any, any, CustomEdgeTypes>
-
 
 interface GraphViewProps {
   dataset: Dataset,
@@ -68,24 +54,16 @@ interface GraphViewProps {
 }
 
 const props = defineProps<GraphViewProps>()
-
-// Debugging: Log props.dataset to ensure it's reactive
-console.log('props.dataset', props.dataset);
-
 const { elkLayout } = useLayout()
 const { fitView, nodeLookup } = useVueFlow()
 
 const resources = computed(() => {
   const res = resourcesFromDataset(props.dataset);
-  // Debugging: Log resources to ensure it's reactive
-  console.log('computed resources', res);
   return res;
 });
 
 const links = computed(() => {
   const lks = linksFromResources(resources.value);
-  // Debugging: Log links to ensure it's reactive
-  console.log('computed links', lks);
   return lks;
 });
 
@@ -93,9 +71,6 @@ const nodes = ref<CustomNode[]>([])
 const edges = ref<CustomEdge[]>([])
 
 watch(resources, async (newResources) => {
-  // Debugging: Log when watch is triggered
-  console.log('watch triggered', newResources);
-
   const nodesWithoutLayout = newResources.map(resource => ({
     id: resource.id,
     type: 'custom',
@@ -114,16 +89,14 @@ watch(resources, async (newResources) => {
     animated: false,
     data: link,
     type: 'custom',
-    markerEnd: 'logo',
-    markerStart: 'logo',
+    markerEnd: 'big-arrow',
+    markerStart: 'circle'
   }));
 
-  const layoutedStuff = await elkLayout(nodesWithoutLayout, newEdges);
-  nodes.value = (layoutedStuff as any).nodes as unknown as CustomNode[];
-  edges.value = (layoutedStuff as any).edges as unknown as CustomEdge[];
+  const nodesWithLayout = await elkLayout(nodesWithoutLayout, newEdges);
+  nodes.value = (nodesWithLayout as any).nodes as unknown as CustomNode[];
+  edges.value = (nodesWithLayout as any).edges as unknown as CustomEdge[];
 
-  console.log('nodes', nodes.value);
-  console.log('edges', edges.value);
   await nextTick();
   fitView();
 });
@@ -131,22 +104,11 @@ watch(resources, async (newResources) => {
 function onNodeDrag(nodeDragEvent: NodeDragEvent) {
   const focusNode = nodeDragEvent.node;
   
+  // outgoing arrows: here we check the if we have to use the right or left handle for the focus and target node
   const linksFromFocusNodeToTarget = edges.value.filter(e => e.source === focusNode.id);
-
-
-
-  // linksFromFocusNodeToTarget.forEach(e => console.log('link', focusNode.id, '->', e.id));
-  
-  // find all target nodes
   const targetNodes = linksFromFocusNodeToTarget.flatMap(e => nodeLookup.value.get(e.target)) as CustomNode[];
-
-
   targetNodes.forEach(targetNode=> {
-    // is targetNode left of focusNode?
-  //  console.log(targetNode.id, targetNode.position.x, focusNode.position.x);
     if(targetNode?.position.x < focusNode.position.x) {
- //     console.log(targetNode.id, targetNode.position.x, 'change to left' );
-
       // the target node is left check if we have to update the handle of the edge 
       const edgesToCheck = edges.value.filter(e => e.source === focusNode.id && e.target === targetNode.id);
       
@@ -157,8 +119,6 @@ function onNodeDrag(nodeDragEvent: NodeDragEvent) {
         }
       })
     } else {
-    //  console.log(targetNode.id, targetNode.position.x, 'change to right' );
-
      // the target node is left check if we have to update the handle of the edge 
      const edgesToCheck = edges.value.filter(e => e.source === focusNode.id && e.target === targetNode.id);
       edgesToCheck.forEach(e => {
@@ -169,9 +129,12 @@ function onNodeDrag(nodeDragEvent: NodeDragEvent) {
       })
     }
   })
+  // end outgoing arrows
 
-  const linkedFromEdges = edges.value.filter(e => e.target === focusNode.id);
-  const sourceNodes = linkedFromEdges.flatMap(e => {
+
+  // incoming arrows:  here we check the if we have to use the right or left handle for the focus and source node
+  const linksFromEdgesToFocusNode = edges.value.filter(e => e.target === focusNode.id);
+  const sourceNodes = linksFromEdgesToFocusNode.flatMap(e => {
     const n = nodeLookup.value.get( e.source);
     return n ? [n] : [];
   });
@@ -201,33 +164,27 @@ function onNodeDrag(nodeDragEvent: NodeDragEvent) {
       })
     }
   })
+  // incoming arrows
+
+  // update the edges with the new handles
   edges.value = [...edges.value];
-
-
-
-  
- // nodes.value = updatedNodes
 }
 
-
-
-</script>
-
-<script lang="ts">
-
-export default {
-  name: 'GraphView'
-}
+ function zoomToNode(e: any) {
+	fitView({
+		nodes: [e.edge.sourceNode.id],
+		duration: 1000, // use this if you want a smooth transition to the node
+		padding: 0.3 // use this for some padding around the node
+	})
+} 
 
 </script>
 
 <style>
 
-/* these are necessary styles for vue flow */
 @import '@vue-flow/core/dist/style.css';
-
-/* this contains the default theme, these are optional styles */
 @import '@vue-flow/core/dist/theme-default.css';
+
 #menu {
   position: fixed;
   bottom: 20px;

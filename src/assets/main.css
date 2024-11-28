@@ -24,10 +24,3 @@ body {
 a {
   text-decoration: none;
 }
-
-
-
-g.selected>* {
-  stroke: rgb(0, 247, 255) !important;
-  stroke-width: 6 !important;
-}

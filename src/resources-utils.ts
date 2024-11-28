@@ -36,7 +36,6 @@ export function resourcesFromDataset(dataset: Dataset): Resource[] {
             properties: [...properties.values()]
         } as Resource
     });
-    console.log('resource from dataset ')
     return resources
 }
 
@@ -66,6 +65,5 @@ export function linksFromResources(resources: Resource[]): Link[] {
             return links
         },
             []);
-    console.log(links)
     return links
 }

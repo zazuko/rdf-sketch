@@ -34,13 +34,10 @@ export class RdfPreviewPanel {
 
         const updateWebview = (document: TextDocument) => {
             const content = document.getText();
-            console.log('updateWebview', content);
-
         };
 
 
         workspace.onDidChangeTextDocument((textDocumentChangeEvent: TextDocumentChangeEvent) => {
-            console.log('onDidChangeTextDocument');
             if (textDocumentChangeEvent.document !== editor) {
                 return;
             }

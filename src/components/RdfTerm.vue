@@ -1,7 +1,9 @@
 <template>
 
   <div>
-  <span class="term"  @mousedown="avoidNodeDrag">{{ displayValue }}<small v-if="language" style="color: grey">@{{ language }}</small></span>
+  <span v-if="props.term.termType === 'NamedNode'" class="term" @mousedown="avoidNodeDrag" style="cursor: pointer;">{{ displayValue }}</span>
+  <span v-if="props.term.termType === 'BlankNode'" class="term" @mousedown="avoidNodeDrag" style="cursor: pointer;">[{{ displayValue }}]</span>
+  <span v-if="props.term.termType === 'Literal'" class="term" @mousedown="avoidNodeDrag">{{ displayValue }}<small v-if="language" style="color: grey">@{{ language }}</small></span>
   </div>
 
 </template>

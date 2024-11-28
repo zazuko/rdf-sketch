@@ -45,14 +45,12 @@
 <script setup lang="ts">
 
 import type { Dataset, Term } from '@rdfjs/types';
-import { computed, ref, watch, nextTick, inject } from 'vue'
+import { computed, ref } from 'vue'
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { shrinkTerm } from '@/rdf/shrink-term';
 import { FilterMatchMode } from '@primevue/core/api';
 import InputText from 'primevue/inputtext';
-
-
 
 interface SPO {
     subject: string,
@@ -107,7 +105,6 @@ const filters = ref({
 function nodeSelected(term: Term) {
     emit('selected', term);
 }
-
 
 </script>
 
