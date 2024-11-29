@@ -1,13 +1,10 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
 
-import { Position, useVueFlow, type Node, type Edge } from '@vue-flow/core'
-import { ref } from 'vue'
+import { type Node, type Edge } from '@vue-flow/core'
 
 const headerHeight = 76;
 const rowHeight = 52;
 
-const width = 800
-const height = 800
 /**
  * Composable to run the layout algorithm on the graph.
  * It uses the `dagre` library to calculate the layout of the nodes and edges.
@@ -15,30 +12,7 @@ const height = 800
 export function useLayout() {
 
     async function elkLayout(nodes: Node[], edges: Edge[]) {
-        /**
-         * * sporeOverlap: This algorithm is based on the Spore algorithm, which is a force-directed layout algorithm. It is designed to minimize the number of edge crossings and to keep the nodes evenly distributed. It is particularly useful for large graphs.
-         * * force: This algorithm is based on a force-directed layout algorithm. It is designed to minimize the number of edge crossings and to keep the nodes evenly distributed. It is particularly useful for large graphs.
-        *
-        const options = {
-            'elk.algorithm': 'box',
-            'elk.layered.spacing.nodeNodeBetweenLayers': '100',
-            'elk.spacing.nodeNode': '200',
-        };
-        /*
-        const options = {
-            'elk.algorithm': 'force',
-            'elk.force.iterations': '1000', // Number of iterations for the force algorithm
-            'elk.force.repulsiveForce': '1000', // Strength of the repulsive force
-            'elk.force.attractiveForce': '0.1', // Strength of the attractive force
-            'elk.force.gravityForce': '0.1', // Strength of the gravity force
-            'elk.force.compoundGravity': '0.5', // Strength of the compound gravity force
-            'elk.force.mass': '1', // Mass of the nodes
-            'elk.force.damping': '0.9', // Damping factor for the force algorithm
-            'elk.force.stiffness': '0.1', // Stiffness of the springs
-            'elk.force.charge': '-30', // Charge of the nodes
-            'elk.force.center': 'true', // Whether to center the layout
-        };
-        */
+
         const options = {
             "algorithm": "mrtree",                                       // MRTREE algorithm for tree layout
             "org.eclipse.elk.direction": "RIGHT",                         // Layout direction (can be UP, DOWN, LEFT, RIGHT)
@@ -50,8 +24,6 @@ export function useLayout() {
             "org.eclipse.elk.mrtree.nodePlacement.strategy": "SIMPLE",   // Simple node placement strategy
             "org.eclipse.elk.mrtree.nodePlacement.bk.fixedAlignment": "BALANCED", // Balanced alignment for nodes
         };
-
-        const isHorizontal = options['org.eclipse.elk.direction'] === 'RIGHT';
 
         const elkNodes: any[] = nodes.map((node) => {
             return {
@@ -77,24 +49,6 @@ export function useLayout() {
                 targets: [edge.target],
             }
         });
-
-
-        /*const graph = {
-            id: 'root',
-            layoutOptions: options,
-            children: nodes.map((node) => ({
-                ...node,
-                // Adjust the target and source handle positions based on the layout
-                // direction.
-                targetPosition: isHorizontal ? 'left' : 'top',
-                sourcePosition: isHorizontal ? 'right' : 'bottom',
-
-                // Hardcode a width and height for elk to use when layouting.
-                width: 1000,
-                height: headerHeight + rowHeight * node.data.resource.properties.length,
-            })),
-            edges: edges,
-        };*/
 
         const graph = {
             id: 'root',
@@ -149,9 +103,6 @@ export function useLayout() {
                 }
             })
             .catch(console.error);
-        //
-
-
 
     }
 

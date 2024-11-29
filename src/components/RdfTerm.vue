@@ -18,10 +18,7 @@ interface RdfTermProps {
   term: Term
 }
 
-
 const props = defineProps<RdfTermProps>()
-
-
 
 const displayValue = computed(() => {
   return shrinkTerm(props.term)
@@ -34,26 +31,9 @@ const language  = computed<string|null>(() => {
   return props.term.language ?? null;
 })
 
-
-const tooltip = computed<string>(() => {
-  const term = props.term;
-
-  if (term.termType === 'Literal') {
-    const datatype = term.datatype ? `^^${ shrinkTerm(term.datatype)}` : ''
-    const language = term.language ? `@${term.language}` : ''
-
-    return `${term.value}${datatype}${language}`
-  }
-  return term.value
-})
-
 function avoidNodeDrag(event: MouseEvent) {
  event.stopPropagation();
 }
-
-
-
-
 
 </script>
 <style scoped>

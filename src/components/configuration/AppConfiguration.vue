@@ -10,15 +10,6 @@
 
 
 
-import { computed } from 'vue';
-
-
-interface ConfigurationProps {
-}
-
-
-const props = defineProps<ConfigurationProps>()
-
 
 
 
