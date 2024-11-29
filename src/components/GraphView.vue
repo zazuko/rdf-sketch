@@ -1,99 +1,173 @@
 <template>
-  <GraphLayout class="w-full h-full" :layout-cfg="layoutCfg" :nodes="resources" :links="links" :active-links="activeLinks"
-    :auto-zoom="false" @link-enter="onLinkHover" @link-out="onUnhover">
-    <template v-slot:node="{ node }">
-      <ResourceCard :resource="node" :active-links="activeLinks" :env="env" @hover-title="onHoverResource"
-        @unhover-title="onUnhover" @hover-property="onHoverProperty" @unhover-property="onUnhover" />
+  
+   
+    <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.05" :max-zoom="10" @node-drag="onNodeDrag" @edge-click="zoomToNode" >
+   
+      <template #node-custom="customNodeProps">
+      <ResourceNode v-bind="customNodeProps" />
     </template>
-  </GraphLayout>
-  <div id="menu">
-    <template v-if="showlayoutControls">
-      <div class="control">
-        <label>Rank Direction:</label>
-        <select v-model="layoutCfg.rankdir">
-          <option value="TB">Top to Bottom</option>
-          <option value="BT">Bottom to Top</option>
-          <option value="LR">Left to Right</option>
-          <option value="RL">Right to Left</option>
-        </select>
-      </div>
-      <div class="control">
-        <label>Node Separation:</label>
-        <input type="range" v-model="layoutCfg.nodesep" min="10" max="100">
-      </div>
-      <div class="control">
-        <label>Rank Separation:</label>
-        <input type="range" v-model="layoutCfg.ranksep" min="10" max="100">
-      </div>
+    <template #edge-custom="customEdgeProps">
+      <FloatingEdge v-bind="customEdgeProps" />
     </template>
-    <cog-icon class="cog w-5 h-5" @click="toggleLayoutControls"></cog-icon>
-  </div>
+  </VueFlow>
 </template>
 
 <script setup lang="ts">
 
-import { computed, ref } from 'vue'
-import { GraphLayout } from '@zazuko/vue-graph-layout'
-import ResourceCard from './ResourceCard.vue'
-import DatasetExt from 'rdf-ext/lib/Dataset'
+import { computed, ref, watch, nextTick } from 'vue'
 
-import { Property, Resource } from '@/model/resource.model';
-import { Link } from '@/model/link.model'
-import { linksFromResources, resourcesFromDataset } from '@/resources-utils'
-import { CogIcon } from '@heroicons/vue/24/solid'
+import type { Resource } from '@/model/resource.model';
+import type { Dataset } from '@rdfjs/types';
+import { linksFromResources, resourcesFromDataset } from '../resources-utils';
+import FloatingEdge from './graph/floating-edge/FloatingEdge.vue';
 
-interface Props {
-  dataset: DatasetExt,
+import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent, MarkerType} from '@vue-flow/core';
+
+import { useLayout } from '../layout/use-layout'; 
+import ResourceNode  from './graph/resource-node/ResourceNode.vue'
+
+
+export type CustomNodeTypes = 'custom' | 'special'
+export type CustomNode = Node<Resource, {}, CustomNodeTypes>
+type CustomEdgeTypes = 'custom' | 'special'
+export type CustomEdge = Edge<any, any, CustomEdgeTypes>
+
+interface GraphViewProps {
+  dataset: Dataset,
   env: any
 }
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-const props = defineProps<Props>()
 
-const resources = computed(() => resourcesFromDataset(props.dataset, props.env))
-const links = computed(() => linksFromResources(resources.value))
-const activeLinks = ref([])
+const props = defineProps<GraphViewProps>()
+const { elkLayout } = useLayout()
+const { fitView, nodeLookup } = useVueFlow()
 
-function toggleLayoutControls() {
-  showlayoutControls.value = !showlayoutControls.value
+const resources = computed(() => {
+  const res = resourcesFromDataset(props.dataset);
+  return res;
+});
+
+const links = computed(() => {
+  const lks = linksFromResources(resources.value);
+  return lks;
+});
+
+const nodes = ref<CustomNode[]>([])
+const edges = ref<CustomEdge[]>([])
+
+watch(resources, async (newResources) => {
+  const nodesWithoutLayout = newResources.map(resource => ({
+    id: resource.id,
+    type: 'custom',
+    position: { x: 0, y: 0 },
+    data: {
+      resource,
+      env: props.env,
+    },
+  }));
+
+  const newEdges = links.value.map(link => ({
+    id: `${link.source}-${link.sourceProperty}-${link.target}`,
+    source: link.source,
+    target: link.target,
+    sourceHandle: `${link.source}-${link.sourceProperty}-right`,
+    animated: false,
+    data: link,
+    type: 'custom',
+    markerEnd:  MarkerType.ArrowClosed
+  }));
+
+  const nodesWithLayout = await elkLayout(nodesWithoutLayout, newEdges);
+  nodes.value = (nodesWithLayout as any).nodes as unknown as CustomNode[];
+  edges.value = (nodesWithLayout as any).edges as unknown as CustomEdge[];
+
+  await nextTick();
+  fitView();
+});
+
+function onNodeDrag(nodeDragEvent: NodeDragEvent) {
+  const focusNode = nodeDragEvent.node;
+  
+  // outgoing arrows: here we check the if we have to use the right or left handle for the focus and target node
+  const linksFromFocusNodeToTarget = edges.value.filter(e => e.source === focusNode.id);
+  const targetNodes = linksFromFocusNodeToTarget.flatMap(e => nodeLookup.value.get(e.target)) as CustomNode[];
+  targetNodes.forEach(targetNode=> {
+    if(targetNode?.position.x < focusNode.position.x) {
+      // the target node is left check if we have to update the handle of the edge 
+      const edgesToCheck = edges.value.filter(e => e.source === focusNode.id && e.target === targetNode.id);
+      
+      edgesToCheck.forEach(e => {
+        const currentSourceHandle = e.sourceHandle;
+        if(currentSourceHandle?.endsWith('-right')) {
+          e.sourceHandle = `${focusNode.id}-${e.data?.sourceProperty}-left`;
+        }
+      })
+    } else {
+     // the target node is left check if we have to update the handle of the edge 
+     const edgesToCheck = edges.value.filter(e => e.source === focusNode.id && e.target === targetNode.id);
+      edgesToCheck.forEach(e => {
+        const currentSourceHandle = e.sourceHandle;
+        if(currentSourceHandle?.endsWith('-left')) {
+          e.sourceHandle = `${focusNode.id}-${e.data?.sourceProperty}-right`;
+        }
+      })
+    }
+  })
+  // end outgoing arrows
+
+
+  // incoming arrows:  here we check the if we have to use the right or left handle for the focus and source node
+  const linksFromEdgesToFocusNode = edges.value.filter(e => e.target === focusNode.id);
+  const sourceNodes = linksFromEdgesToFocusNode.flatMap(e => {
+    const n = nodeLookup.value.get( e.source);
+    return n ? [n] : [];
+  });
+    // iterate over all target nodes and check if focusNode is left or right of the target node
+    sourceNodes.forEach(sourceNode => {
+    // is targetNode left of focusNode?
+    if(sourceNode.position.x < focusNode.position.x) {
+      // the target node is left check if we have to update the handle of the edge 
+      const edgesToCheck = edges.value.filter(e => e.target === focusNode.id && e.source === sourceNode.id);
+      
+      edgesToCheck.forEach(e => {
+        const currentSourceHandle = e.sourceHandle;
+        if(currentSourceHandle && currentSourceHandle.endsWith('-left')) {
+          e.sourceHandle = `${sourceNode!.id}-${e.data!.sourceProperty}-right`;
+        }
+      })
+    } else {
+     // the target node is right check if we have to update the handle of the edge 
+
+     const edgesToCheck = edges.value.filter(e => e.target === focusNode.id && e.source === sourceNode.id);
+      edgesToCheck.forEach(e => {
+        const currentSourceHandle = e.sourceHandle;
+        if(currentSourceHandle && currentSourceHandle?.endsWith('-right')) {
+
+          e.sourceHandle = `${sourceNode.id}-${e.data!.sourceProperty}-left`;
+        }
+      })
+    }
+  })
+  // incoming arrows
+
+  // update the edges with the new handles
+  edges.value = [...edges.value];
 }
-const showlayoutControls = ref(false)
-const layoutCfg = ref({
-  rankdir: 'RL',
-  align: undefined,
-  nodesep: 20,
-  ranksep: 50,
-  marginx: 10,
-  marginy: 10,
-})
 
-function onLinkHover(link: Link): void {
-  activeLinks.value.push(link)
-}
-
-function onUnhover(): void {
-  activeLinks.value = []
-}
-
-function onHoverResource(resource: Resource): void {
-  activeLinks.value = links.value.filter((link) => link.source === resource.id)
-}
-
-function onHoverProperty(resource: Resource, property: Property): void {
-  activeLinks.value = links.value.filter(link => (
-    link.source === resource.id && link.sourceProperty === property.id))
-}
-
-</script>
-
-<script lang="ts">
-
-export default {
-  name: 'GraphView'
-}
+ function zoomToNode(e: any) {
+	fitView({
+		nodes: [e.edge.sourceNode.id],
+		duration: 1000, // use this if you want a smooth transition to the node
+		padding: 0.3 // use this for some padding around the node
+	})
+} 
 
 </script>
 
 <style>
+
+@import '@vue-flow/core/dist/style.css';
+@import '@vue-flow/core/dist/theme-default.css';
+
 #menu {
   position: fixed;
   bottom: 20px;
@@ -116,4 +190,6 @@ export default {
   margin-right: 0;
   color: #8a9ba1;
 }
+
 </style>
+

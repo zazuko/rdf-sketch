@@ -1,6 +1,5 @@
 import TermSet from "@rdfjs/term-set";
-import { Term } from "@rdfjs/types";
-
+import type { Term } from "@rdfjs/types";
 
 export interface Resource {
     id: string,

@@ -1,14 +1,23 @@
+import './assets/main.css'
+
 import { createApp } from 'vue'
+
+import PrimeVue from 'primevue/config'
+
+import Aura from '@primevue/themes/aura'
 import App from './App.vue'
-import './styles/index.css'
-import './registerServiceWorker'
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.directive('focus', {
-  mounted(el) {
-    el.focus()
-  },
-})
+app.use(PrimeVue, {
+    theme: {
+        preset: Aura
+    },
+    options: {
+        darkModeSelector: '.my-app-dark',
+        cssLayer: false
+    }
+});
 
 app.mount('#app')
+

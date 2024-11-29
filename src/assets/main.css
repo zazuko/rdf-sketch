@@ -1,0 +1,26 @@
+@import 'primeicons/primeicons.css';
+@layer tailwind-base, primevue, tailwind-utilities;
+
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-utilities {
+  @tailwind components;
+  @tailwind utilities;
+}
+
+body {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  margin: 8px;
+  font-family:
+    'Helvetica Neue',
+    sans-serif;
+
+}
+
+a {
+  text-decoration: none;
+}

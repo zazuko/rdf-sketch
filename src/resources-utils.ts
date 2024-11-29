@@ -1,26 +1,27 @@
 import TermSet from "@rdfjs/term-set"
-import DatasetExt from "rdf-ext/lib/Dataset"
-import { Term } from "rdf-js"
-import { Link } from "./model/link.model"
-import { Resource } from "./model/resource.model"
-import rdf from 'rdf-ext';
+import type { Link } from "./model/link.model"
+import type { Resource } from "./model/resource.model"
+import { rdfEnvironment } from './rdf/environment';
+import { shrinkTerm } from "./rdf/shrink-term";
+import type { Dataset } from "@rdfjs/types";
 
-export function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] {
+
+export function resourcesFromDataset(dataset: Dataset): Resource[] {
     const extractedSubjects = [...dataset].map(quad => quad.subject)
     const extractedObject = [...dataset].filter(
-        quad => !quad.predicate.equals(rdf.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))).map(quad => quad.object).filter(o => o.termType === "BlankNode" || o.termType === "NamedNode")
+        quad => !quad.predicate.equals(rdfEnvironment.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))).map(quad => quad.object).filter(o => o.termType === "BlankNode" || o.termType === "NamedNode")
 
-    const nodeSet = new TermSet<Term>([...extractedSubjects,...extractedObject ])
+    const nodeSet = new TermSet([...extractedSubjects, ...extractedObject])
 
-    return [...nodeSet].map(node => {
+    const resources = [...nodeSet].map(node => {
         const quads = dataset.match(node)
         const properties = [...quads].reduce((acc, { predicate, object }) => {
             if (!acc.has(predicate.value)) {
                 const property = {
                     id: predicate.value,
                     term: predicate,
-                    name: env.shrink(predicate),
-                    values: new TermSet<Term>(),
+                    name: shrinkTerm(predicate),
+                    values: new TermSet(),
                 }
                 acc.set(predicate.value, property)
             }
@@ -28,21 +29,29 @@ export function resourcesFromDataset(dataset: DatasetExt, env: any): Resource[] 
             return acc
         }, new Map())
 
+        // order properties by name but rdf:type first
+        const orderedProperties = [...properties.values()].sort((a, b) => {
+            if (a.name === 'rdf:type') return -1;
+            if (b.name === 'rdf:type') return 1;
+            return a.name.localeCompare(b.name);
+        })
         return {
             id: node.value,
             term: node,
-            name: env.shrink(node),
-            properties: [...properties.values()]
+            name: shrinkTerm(node),
+            properties: orderedProperties
         } as Resource
-    })
+    });
+    return resources
 }
+
 
 export function linksFromResources(resources: Resource[]): Link[] {
     const resourceIds = new TermSet(resources.map(resource => {
         return resource.term
     }))
 
-    return resources
+    const links = resources
         .flatMap(resource => resource.properties.map(property => {
             return ({ ...property, resource })
         }))
@@ -60,6 +69,7 @@ export function linksFromResources(resources: Resource[]): Link[] {
                 }
             })
             return links
-        }, 
-    []);
+        },
+            []);
+    return links
 }
