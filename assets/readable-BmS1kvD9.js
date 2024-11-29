@@ -1,0 +1,1 @@
+const n=new Set(["_write","_writableState","writable"]);function u(a){return new Proxy(a,{has(r,e){return n.has(e)?!1:Reflect.has(...arguments)},get(r,e){if(n.has(e))return;const t=Reflect.get(...arguments);return t&&typeof t.bind=="function"?t.bind(r):t},set(r,e,t){if(!n.has(e))return Reflect.set(...arguments)}})}export{u as r};
