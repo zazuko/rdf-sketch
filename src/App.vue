@@ -109,11 +109,13 @@ function onNdeSelected(term: Term) {
 
 
   <Dialog v-model:visible="showAboutDialog" modal header="Zazuko Sketch" :style="{ width: '60rem' }">
-    <span class="mb-8"></span>
+    <div style="display: flex; flex-direction: row; gap: 24px">  
+      <img src="/img/icons/zazuko_icon.svg" alt="Zazuko Logo" style="width: 100px;">
+
     <div style="opacity: 0.8;" >
 Sketch is a simple yet powerful tool for visualizing RDF graphs. It allows you to:
 
-<ul>
+<ul style="padding-left: 20px">
   <li>
     Traverse and Explore: Seamlessly navigate through your RDF graphs.
   </li>
@@ -121,16 +123,12 @@ Sketch is a simple yet powerful tool for visualizing RDF graphs. It allows you t
     Search with Ease:Quickly locate nodes and connections.
   </li>
   <li>
-    Interact Intuitively: Click on edges to reach their source nodes or on objects to explore the target of an edge.
+    Interact Intuitively: Click edges and Objects (SPO) to navigate.
   </li>
 </ul>
-<br>
-<br>
-
-With Sketch, working with RDF data becomes both accessible and efficient, making it easier to explore and understand complex relationships
+  You can find more tools and resources at <a href="https://zazuko.com" target="_blank">Zazuko.com</a>.
+</div>
     </div>
-    <br>
-   
 </Dialog>
 
 

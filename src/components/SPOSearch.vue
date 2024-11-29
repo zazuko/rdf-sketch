@@ -117,7 +117,6 @@ span {
 .node-link {
     cursor: pointer;
     text-decoration: underline;
-
 }
 
 </style>

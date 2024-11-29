@@ -18,9 +18,6 @@
     <template #edge-custom="customEdgeProps">
       <FloatingEdge v-bind="customEdgeProps" />
     </template>
-    <MiniMap pannable zoomable />
-    <Controls />
-   
   </VueFlow>
 </template>
 
@@ -34,8 +31,6 @@ import { linksFromResources, resourcesFromDataset } from '../resources-utils';
 import FloatingEdge from './graph/floating-edge/FloatingEdge.vue';
 
 import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent} from '@vue-flow/core';
-import { MiniMap } from '@vue-flow/minimap';
-import { Controls } from '@vue-flow/controls';
 import '@vue-flow/minimap/dist/style.css';
 import '@vue-flow/controls/dist/style.css';
 

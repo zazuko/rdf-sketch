@@ -29,11 +29,17 @@ export function resourcesFromDataset(dataset: Dataset): Resource[] {
             return acc
         }, new Map())
 
+        // order properties by name but rdf:type first
+        const orderedProperties = [...properties.values()].sort((a, b) => {
+            if (a.name === 'rdf:type') return -1;
+            if (b.name === 'rdf:type') return 1;
+            return a.name.localeCompare(b.name);
+        })
         return {
             id: node.value,
             term: node,
             name: shrinkTerm(node),
-            properties: [...properties.values()]
+            properties: orderedProperties
         } as Resource
     });
     return resources
