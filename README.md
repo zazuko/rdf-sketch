@@ -1,4 +1,7 @@
-# rdf-sketch
+# Zazuko RDF Sketch
+
+This is a simple tool to Visualize RDF and provides the ability to Search and Navigate through the graph.
+
 
 ## Project setup
 
@@ -9,7 +12,7 @@ npm install
 ### Compiles and hot-reloads for development
 
 ```sh
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
@@ -24,6 +27,15 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
+### The project is based on the following technologies:
 
-See [Configuration Reference](https://cli.vuejs.org/config/).
+* [Vue.js](https://vuejs.org)
+* [Vue Flow](https://vueflow.dev)
+* [rdfjs-elements](https://github.com/zazuko/rdfjs-elements)
+
+
+
+## VSCode Extension
+
+Will be part of this Repository soon.
+
