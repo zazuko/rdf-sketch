@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { computed, type CSSProperties } from 'vue'
 import type { EdgeProps, GraphNode, MarkerType } from '@vue-flow/core'
-import { BaseEdge, getBezierPath, useVueFlow } from '@vue-flow/core'
+import { BaseEdge, getBezierPath } from '@vue-flow/core'
 import { getEdgeParams } from './floating-edge-utils'
-const { fitView } = useVueFlow()
 
 interface FloatingEdgeProps extends EdgeProps {
   id: string
@@ -28,13 +27,13 @@ const newEdgePath = computed(
     }
 
     
-    const sx = props.sourceX // < props.targetX ? props.sourceX  - 3 : props.sourceX + 3;
+    const sx = props.sourceX  < props.targetX ? props.sourceX  - 3 : props.sourceX + 3;
     const sy = props.sourceY;
     const sourcePos = props.sourcePosition;
       return getBezierPath({
         sourceX: sx,
         sourceY: sy,
-        targetX: edgeParams.value.tx,
+        targetX: edgeParams.value.tx < edgeParams.value.sx ? edgeParams.value.tx + 3 : edgeParams.value.tx - 3,
         targetY: edgeParams.value.ty,
         sourcePosition: sourcePos,
         targetPosition: edgeParams.value.targetPos,

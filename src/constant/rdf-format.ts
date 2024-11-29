@@ -3,7 +3,7 @@ export enum RdfSerializationType {
     Trig = 'application/trig',
     NQuads = 'application/n-quads',
     NTriples = 'application/n-triples',
-    N3 = 'text/n3',
+    //  N3 = 'text/n3',
     Turtle = 'text/turtle',
     RdfXML = 'application/rdf+xml',
 }
@@ -34,11 +34,11 @@ export const rdfFormats: RdfFormat[] = [
         name: 'N-Triples',
         type: RdfSerializationType.NTriples,
     },
-    {
-        contentType: RdfSerializationType.N3,
-        name: 'N3',
-        type: RdfSerializationType.N3,
-    },
+    /*  {
+          contentType: RdfSerializationType.N3,
+          name: 'N3',
+          type: RdfSerializationType.N3,
+      },*/
 
     {
         contentType: RdfSerializationType.RdfXML,

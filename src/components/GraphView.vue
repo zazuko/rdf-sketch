@@ -1,14 +1,5 @@
 <template>
-   <svg style="height: 0; width: 0;">
-        <defs>        
-          <marker id="big-arrow" class="vue-flow__arrowhead" viewBox="-10 -10 20 20" refX="0" refY="0" markerWidth="12.5" markerHeight="12.5" markerUnits="strokeWidth" orient="auto-start-reverse">
-          <polyline stroke-linecap="round" stroke-linejoin="round" fill="rgb(177, 177, 183)" points="-10,-8 0,0 -10, 8, -10,-8" style="stroke: rgb(177, 177, 183); stroke-width: 1;"></polyline>
-          </marker>
-          <marker id="circle" class="vue-flow__arrowhead" viewBox="-10 -10 20 20" refX="0" refY="0" markerWidth="12.5" markerHeight="12.5" markerUnits="strokeWidth" orient="auto-start-reverse">
-          <circle stroke-linecap="round" stroke-linejoin="round" fill="rgb(177, 177, 183)" rx="0" ry="0" r="5" style="stroke: rgb(177, 177, 183); stroke-width: 1;"></circle>
-          </marker>
-        </defs>
-    </svg>
+  
    
     <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.05" :max-zoom="10" @node-drag="onNodeDrag" @edge-click="zoomToNode" >
    
@@ -30,18 +21,16 @@ import type { Dataset } from '@rdfjs/types';
 import { linksFromResources, resourcesFromDataset } from '../resources-utils';
 import FloatingEdge from './graph/floating-edge/FloatingEdge.vue';
 
-import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent} from '@vue-flow/core';
-import '@vue-flow/minimap/dist/style.css';
-import '@vue-flow/controls/dist/style.css';
+import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent, MarkerType} from '@vue-flow/core';
 
 import { useLayout } from '../layout/use-layout'; 
 import ResourceNode  from './graph/resource-node/ResourceNode.vue'
 
 
-type CustomNodeTypes = 'custom' | 'special'
-type CustomNode = Node<Resource, {}, CustomNodeTypes>
+export type CustomNodeTypes = 'custom' | 'special'
+export type CustomNode = Node<Resource, {}, CustomNodeTypes>
 type CustomEdgeTypes = 'custom' | 'special'
-type CustomEdge = Edge<any, any, CustomEdgeTypes>
+export type CustomEdge = Edge<any, any, CustomEdgeTypes>
 
 interface GraphViewProps {
   dataset: Dataset,
@@ -84,8 +73,7 @@ watch(resources, async (newResources) => {
     animated: false,
     data: link,
     type: 'custom',
-    markerEnd: 'big-arrow',
-    markerStart: 'circle'
+    markerEnd:  MarkerType.ArrowClosed
   }));
 
   const nodesWithLayout = await elkLayout(nodesWithoutLayout, newEdges);

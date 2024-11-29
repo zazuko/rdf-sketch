@@ -108,7 +108,7 @@ function onNdeSelected(term: Term) {
 
 
 
-  <Dialog v-model:visible="showAboutDialog" modal header="Zazuko Sketch" :style="{ width: '60rem' }">
+  <Dialog v-model:visible="showAboutDialog" modal header="Zazuko RDF Sketch" :style="{ width: '60rem' }">
     <div style="display: flex; flex-direction: row; gap: 24px">  
       <img src="/img/icons/zazuko_icon.svg" alt="Zazuko Logo" style="width: 100px;">
 

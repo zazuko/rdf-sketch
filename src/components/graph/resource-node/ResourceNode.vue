@@ -36,9 +36,6 @@ function zoomToNode(term: Term) {
       <header class="resource-card-header">
 
         <h3 class="resource-title">
-        <!--<TermTooltip :label="props.data.resource.id">
-            {{ props.data.resource.name }}
-          </TermTooltip>--> 
           {{ props.data.resource.name }}
 
         </h3>
@@ -48,7 +45,7 @@ function zoomToNode(term: Term) {
          <div v-for="(property, index) in props.data.resource.properties" :key="index" :data-id="property.id" class="table-row">
          <div>
           <div v-for="value in property.values" :key="value.value" style="position: relative;">
-            <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0" />
+            <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0" :connectable="false"></Handle>
           </div>
         </div>
         <div class="predicate">
@@ -62,7 +59,7 @@ function zoomToNode(term: Term) {
         </div>
 
         <div v-for="value in property.values" :key="value.value" style="position: relative;">
-          <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0;" />
+          <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0;" :connectable="false"/>
         </div>
           
       </div>
