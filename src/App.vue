@@ -18,12 +18,15 @@ import type { Dataset, Term } from '@rdfjs/types';
 
 import { prefixMap } from './rdf/prefix-map'; 
 import SPOSearch from './components/SPOSearch.vue';
+import ShareButton from './components/share-button/ShareButton.vue';
 import { useVueFlow } from '@vue-flow/core';
 
 const { fitView, nodeLookup} = useVueFlow()
 
 const selectedFormat = ref<RdfFormat>(rdfFormats.find(f => f.type === RdfSerializationType.Turtle) ?? rdfFormats[0]);
 const rdfFormatOptions = ref<RdfFormat[]>(rdfFormats);
+const rdfText = ref<string>('');
+
 const currentSerialization = computed(() => selectedFormat.value.type);
 const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 const hideEditorSplitterPanel = ref(false);
@@ -33,6 +36,7 @@ const showAboutDialog = ref(false);
 function onQuadsChanged(rdfData: RdfData) {
   const newDataset = rdfEnvironment.dataset(rdfData.quads) as unknown as  Dataset;
   prefixMap.update(rdfData.prefix);
+  rdfText.value = rdfData.rdfText;
   dataset.value = newDataset;
 }
 function makeEditorSmall() {
@@ -52,8 +56,6 @@ function onFormatChange(rdfSerializationType: RdfSerializationType) {
 }
 
 
-const env = rdfEnvironment;
-
 function onNdeSelected(term: Term) {
   if (!(term.termType === 'NamedNode' || term.termType === 'BlankNode')) {
     return
@@ -70,6 +72,7 @@ function onNdeSelected(term: Term) {
 }
 
 
+
 </script>
 
 <template>
@@ -79,6 +82,7 @@ function onNdeSelected(term: Term) {
       <Button v-if="!hideEditorSplitterPanel" icon="pi pi-file-edit" class="mr-2" severity="secondary" @click="makeEditorSmall" text ></Button>
       <Button v-if="hideEditorSplitterPanel" icon="pi pi-file-edit" class="mr-2" severity="secondary" @click="makeEditorBig" text ></Button>
       <Select v-model="selectedFormat" :options="rdfFormatOptions" optionLabel="name" placeholder="Select RDF Serialization" checkmark :highlightOnSelect="false"></Select>
+
     </template>
 
     <template #center>
@@ -86,24 +90,30 @@ function onNdeSelected(term: Term) {
     </template>
 
     <template #end>
-
       <Button icon="pi pi-search" class="mr-2" severity="secondary" @click="toggleSearch" text></Button>
+      <ShareButton :format="currentSerialization" :rdf-text="rdfText"></ShareButton>
       <Button icon="pi pi-lightbulb" class="mr-2" severity="secondary" @click="showAboutDialog = !showAboutDialog" text></Button>
       <Button as="a" icon="pi pi-github" class="mr-2" severity="secondary" href="https://github.com/zazuko/rdf-sketch"
-        target="_blank"></Button>
+        target="_blank" text></Button>
+
+
     </template>
   </Toolbar>
 
   <Splitter style="height: calc(100vh - (67.5px + ( 2 * 8px) + 8px) ); margin-top: 8px" class="mb-8">
+
     <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
       <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="onFormatChange"/>
     </SplitterPanel>
+
     <SplitterPanel class="flex items-center justify-center">
-      <GraphView :dataset="dataset" :env="env" />
+      <GraphView :dataset="dataset" />
     </SplitterPanel>
+
     <SplitterPanel v-if="!hideSearchPanel">
       <SPOSearch :dataset="dataset" @selected="onNdeSelected"/>
     </SplitterPanel>
+
   </Splitter>
 
 
@@ -134,4 +144,7 @@ Sketch is a simple yet powerful tool for visualizing RDF graphs. It allows you t
 
 
 </template>
+
+
+
 

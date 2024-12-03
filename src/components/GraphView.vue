@@ -10,6 +10,7 @@
       <FloatingEdge v-bind="customEdgeProps" />
     </template>
   </VueFlow>
+
 </template>
 
 <script setup lang="ts">
@@ -21,7 +22,7 @@ import type { Dataset } from '@rdfjs/types';
 import { linksFromResources, resourcesFromDataset } from '../resources-utils';
 import FloatingEdge from './graph/floating-edge/FloatingEdge.vue';
 
-import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent, MarkerType} from '@vue-flow/core';
+import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent, MarkerType, type EdgeMouseEvent} from '@vue-flow/core';
 
 import { useLayout } from '../layout/use-layout'; 
 import ResourceNode  from './graph/resource-node/ResourceNode.vue'
@@ -34,7 +35,6 @@ export type CustomEdge = Edge<any, any, CustomEdgeTypes>
 
 interface GraphViewProps {
   dataset: Dataset,
-  env: any
 }
 
 const props = defineProps<GraphViewProps>()
@@ -60,8 +60,7 @@ watch(resources, async (newResources) => {
     type: 'custom',
     position: { x: 0, y: 0 },
     data: {
-      resource,
-      env: props.env,
+      resource
     },
   }));
 
@@ -153,7 +152,7 @@ function onNodeDrag(nodeDragEvent: NodeDragEvent) {
   edges.value = [...edges.value];
 }
 
- function zoomToNode(e: any) {
+ function zoomToNode(e: EdgeMouseEvent) {
 	fitView({
 		nodes: [e.edge.sourceNode.id],
 		duration: 1000, // use this if you want a smooth transition to the node
