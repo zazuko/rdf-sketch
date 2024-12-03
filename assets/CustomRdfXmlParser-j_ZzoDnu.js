@@ -1,4 +1,4 @@
-import{a as pt,e as Pt,b as je,d as Be,s as vo,c as ve}from"./main-BG8rCUrd.js";import{r as Co,a as Io}from"./index-DwdYNYJQ.js";var pn={},tt={},it={},_n={};(function(t){/**
+import{a as pt,e as Pt,b as je,d as Be,s as vo,c as ve}from"./main-UPTG37W_.js";import{r as Co,a as Io}from"./index-BlwBIAJx.js";var pn={},tt={},it={},_n={};(function(t){/**
  * Character classes and associated utilities for the 5th edition of XML 1.0.
  *
  * @author Louis-Dominique Dubeau
