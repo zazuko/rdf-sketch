@@ -35,8 +35,9 @@ export function resourcesFromDataset(dataset: Dataset): Resource[] {
             if (b.name === 'rdf:type') return 1;
             return a.name.localeCompare(b.name);
         })
+
         return {
-            id: node.value,
+            id: node.value === '' ? '_:nobody' : node.value,
             term: node,
             name: shrinkTerm(node),
             properties: orderedProperties
