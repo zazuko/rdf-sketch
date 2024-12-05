@@ -34,7 +34,12 @@
         {
           "when": "resourceLangId == turtle || resourceLangId == json-ld || resourceLangId == ntriples || resourceLangId == rdf-xml",
           "command": "rdf-sketch.openPreview",
-          "group": "navigation"
+          "group": "navigation",
+          "arguments": [
+            {
+              "uri": "${resource}"
+            }
+          ]
         }
       ]
     }
