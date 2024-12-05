@@ -32,7 +32,7 @@
     "menus": {
       "editor/title": [
         {
-          "when": "resourceLangId == turtle || resourceLangId == json-ld || resourceLangId == ntriples || resourceLangId == rdf-xml",
+          "when": "resourceLangId == turtle || resourceLangId === n-quads || resourceLangId == jsonld || resourceLangId == ntriples || resourceLangId == rdf-xml || resourceLangId == trig",
           "command": "rdf-sketch.openPreview",
           "group": "navigation",
           "arguments": [

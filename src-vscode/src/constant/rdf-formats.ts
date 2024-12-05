@@ -14,23 +14,25 @@ export const rdfFormats: RdfFormat[] = [
         name: 'Turtle',
         type: RdfSerializationType.Turtle,
         vscodeLanguageId: 'turtle',
-    }, /*
+    },
     {
         contentType: RdfSerializationType.JsonLD,
         name: 'JSON-LD',
         type: RdfSerializationType.JsonLD,
-    },*/
+        vscodeLanguageId: 'jsonld',
+    },
     {
         contentType: RdfSerializationType.Trig,
         name: 'TriG',
         type: RdfSerializationType.Trig,
         vscodeLanguageId: 'trig',
-    }, /*
+    },
     {
         contentType: RdfSerializationType.NQuads,
         name: 'N-Quads',
         type: RdfSerializationType.NQuads,
-    },*/
+        vscodeLanguageId: 'n-quads',
+    },
     {
         contentType: RdfSerializationType.NTriples,
         name: 'N-Triples',

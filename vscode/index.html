@@ -2,20 +2,33 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VSCode Web View</title>
+	<meta charset="UTF-8">
+	<link rel="icon" href="/favicon.ico">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>VSCode Web View</title>
 </head>
 
 <body>
-    <div id="app"></div>
+	<div id="app"></div>
 
-    <script type="module" src="../src/vscode-webview/main.ts"></script>
+	<script type="module" src="../src/vscode-webview/main.ts"></script>
 
-    <script>
+	<script>
 
-        const longTTL = `
+		const shortTTL = `
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+
+ex:PersonA a ex:Person ;
+	ex:hasName "Alice" ;
+	ex:hasAge 30 .
+`;
+
+
+
+
+		const longTTL = `
         @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -323,19 +336,19 @@ _:g0 a <http://docs.oasis-open.org/legaldocml/ns/akn/3.0#akomaNtoso>, fx:root ;
 
 `;
 
-        // Simulate an update event if i run in browser and not in vscode
+		// Simulate an update event if i run in browser and not in vscode
 
-        setTimeout(() => {
-            const evtMessage = {
-                rdfString: longTTL,
-                contentType: "text/turtle"
-            }
-            const event = new CustomEvent('sketch.updateContent', { detail: evtMessage });
-            window.dispatchEvent(event);
-        }, 500);
+		setTimeout(() => {
+			const evtMessage = {
+				rdfString: shortTTL,
+				contentType: "text/turtle"
+			}
+			const event = new CustomEvent('sketch.updateContent', { detail: evtMessage });
+			window.dispatchEvent(event);
+		}, 500);
 
 
-    </script>
+	</script>
 </body>
 
 </html>

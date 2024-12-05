@@ -16,7 +16,6 @@ import SplitterPanel from 'primevue/splitterpanel';
 
 import SPOSearch from './../components/SPOSearch.vue';
 
-
 import { useVueFlow } from '@vue-flow/core';
 import type { RdfPrefix } from '@/components/RdfEditor.vue';
 
@@ -26,6 +25,7 @@ let observer: MutationObserver | null = null;
 
 const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 const hideSearchPanel = ref(true);
+
 // listen to sketch.updateContent event
 window.addEventListener(updateEventType, async (event: Event) => {
     const customEvent = event as CustomEvent<UpdateMessage>;
@@ -34,7 +34,6 @@ window.addEventListener(updateEventType, async (event: Event) => {
         return;
     }
     const message: UpdateMessage = customEvent.detail;
-    console.log('Received updateContent event', message);
     const rdfStream = toStream(message.rdfString);
     const quadStream = rdfEnvironment.formats.parsers.import(message.contentType, rdfStream);
     
@@ -127,16 +126,25 @@ onBeforeMount(() => {
      </SplitterPanel>
 
     <SplitterPanel v-if="!hideSearchPanel" >
-        <div  style="max-height: 50vh; height: 50vh; border-top: solid 1px var(--p-datatable-header-cell-border-color);">
+        <div class="search">
             <SPOSearch :dataset="dataset" @selected="onNdeSelected"/>
         </div>
     </SplitterPanel>
 
   </Splitter>
 
-
-
-
-
 </template>
 
+
+<style>
+.search {
+  background-color: white;
+  max-height: 40vh; 
+  height: 40vh;
+  border-top: solid 1px var(--p-datatable-header-cell-border-color);
+}
+
+.vscode-dark .search {
+  background-color: rgb(24, 24, 27);
+}
+</style>
