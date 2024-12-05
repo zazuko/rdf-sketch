@@ -1,21 +1,40 @@
-import { ExtensionContext, commands, window } from 'vscode';
+import { ExtensionContext, commands, window, Uri } from 'vscode';
 
 import { RdfPreviewPanel } from './rdf-preview-panel';
 
 export function activate(context: ExtensionContext) {
 
+	const rdfPreviewPanels = new Map<string, RdfPreviewPanel>();
 
-	// dummy
-	let disposable = commands.registerCommand('rdf-sketch.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		window.showInformationMessage('Hello World from rdf-sketch!');
-	});
+	const webViewDisposable = commands.registerCommand('rdf-sketch.openPreview', (uri: Uri) => {
+		const rdfEditor = window.visibleTextEditors.find(editor => editor.document.uri.toString() === uri.toString());
+		if (!rdfEditor) {
+			window.showErrorMessage('Please open an RDF file first');
+			return;
+		}
 
-	context.subscriptions.push(disposable);
+		const uriString = uri.toString();
+		let rdfPreviewPanel = rdfPreviewPanels.get(uriString);
 
-	const webViewDisposable = commands.registerCommand('rdf-sketch.openPreview', () => {
-		RdfPreviewPanel.show(context.extensionUri);
+		if (!rdfPreviewPanel) {
+			rdfPreviewPanel = new RdfPreviewPanel(context, rdfEditor);
+			rdfPreviewPanels.set(uriString, rdfPreviewPanel);
+
+			const disposeListener = rdfPreviewPanel.onDidDispose(() => {
+				rdfPreviewPanels.delete(uriString);
+				disposeListener.dispose();
+			});
+		}
+
+		if (!rdfPreviewPanel.hasExistingPanel) {
+			rdfPreviewPanel.createPanel();
+		} else {
+			window.showInformationMessage('RDF Preview exists.');
+		}
+
+
+
+
 	});
 
 	context.subscriptions.push(webViewDisposable);

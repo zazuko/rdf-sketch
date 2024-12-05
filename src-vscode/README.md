@@ -1,71 +1,44 @@
-# rdf-sketch README
+# VSCode RDF Sketch
 
-This is the README for your extension "rdf-sketch". After writing up a brief description, we recommend including the following sections.
+This extension provides a way to visualize RDF data in [Visual Studio Code](https://code.visualstudio.com).
+
+This extension is based on our [Zazuko Sketch](https://sketch.zazuko.com/) web app. Code is available [here](https://github.com/zazuko/rdf-sketch).
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+* Visualize RDF data in a separate Visual Studio Code tab
+* Auto-layout & zoom
+* Search for nodes
+* Move nodes around
+* Navigate to the source node by clicking on the edge
+* Navigate to the destination node by clicking Object in the triple
 
-For example if there is an image subfolder under your extension project workspace:
+## Installation
 
-\!\[feature X\]\(images/feature-x.png\)
+You can install it directly from the Visual Studio Code Extension tab. It is available on the [Marketplace](https://marketplace.visualstudio.com/items?itemName=Zazuko.vscode-rdf-sketch)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Usage
 
-## Requirements
+1. Open an RDF file in Visual Studio Code
+2. Then click the preview icon on the top right corner of the editor ![Preview Button](images/preview-button.png)
+3. A new tab will open with the visualization 
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+# Demo
 
-## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
-For example:
 
-This extension contributes the following settings:
+### Limitations
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+* Currently, it only supports N3/Turtle RDF serializations.
+* While you can move around boxes, the layout will not persist. Every time something in the data changes, it will auto-layout again and discard what you did before.
+* [YMMV](https://www.urbandictionary.com/define.php?term=ymmv) regarding how much data and what kind of graph you can visualize in a useful way.
 
-## Known Issues
+## Development
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+To start the extension from this repository:
 
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- Open Visual Studio Code for this repository
+- Open debug panel
+- Hit *Run extension* on the upper right corner
+- To open dev tools: `Ctrl+P` and toggle developer tools
