@@ -25,8 +25,7 @@ You can install it directly from the Visual Studio Code Extension tab. It is ava
 
 # Demo
 
-
-
+![sketch-demo](https://github.com/user-attachments/assets/f0e60aa5-adb6-4d14-bf0b-b1e7854887ab)
 
 ### Limitations
 
