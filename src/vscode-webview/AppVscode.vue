@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import { rdfEnvironment } from '../rdf/environment';
+import { prefixMap } from '../rdf/prefix-map';
 import GraphView from '../components/GraphView.vue';
 
 import { onMounted, ref, onBeforeMount} from 'vue';
@@ -17,6 +18,7 @@ import SPOSearch from './../components/SPOSearch.vue';
 
 
 import { useVueFlow } from '@vue-flow/core';
+import type { RdfPrefix } from '@/components/RdfEditor.vue';
 
 const { fitView, nodeLookup} = useVueFlow()
 
@@ -35,6 +37,15 @@ window.addEventListener(updateEventType, async (event: Event) => {
     console.log('Received updateContent event', message);
     const rdfStream = toStream(message.rdfString);
     const quadStream = rdfEnvironment.formats.parsers.import(message.contentType, rdfStream);
+    
+    const prefixList: RdfPrefix[] = [];
+    quadStream?.on('prefix', (prefix, ns) => {
+      prefixList.push({prefix, uri: ns.value});
+    });
+
+    quadStream?.on('end', () => {
+      prefixMap.update(prefixList);
+    });
     if(quadStream === null) {
         console.error('Failed to parse RDF content', message);
         return;
@@ -111,7 +122,7 @@ onBeforeMount(() => {
   <Splitter :unstyled="true" style="height: 100vh; width: 100vw" layout="vertical" >
     <SplitterPanel>
         <div style="height:100%; width: 100%">
-            <GraphView :dataset="dataset" />
+            <GraphView :dataset="dataset"/>
         </div>  
      </SplitterPanel>
 
