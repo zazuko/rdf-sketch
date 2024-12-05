@@ -1,8 +1,8 @@
 <template>
-<DataTable  v-model:filters="filters" filterDisplay="row" :value="spo" scrollable scrollHeight="flex"  tableStyle="min-width: 50rem;">
+<DataTable  v-model:filters="filters" filterDisplay="row" :value="spo" scrollable scrollHeight="flex">
     <Column field="subject" header="Subject" style="width: 20%">  
         <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Subject" />
+            <InputText size="small" v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Subject" />
         </template>
         <template #body="{ data }">
             <span @click="nodeSelected(data.subjectTerm)" class="node-link">
@@ -12,7 +12,7 @@
     </Column>
     <Column field="predicate" header="Predicate" style="width: 20%">
         <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Predicate" />
+            <InputText size="small" v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Predicate" />
         </template>
         <template #body="{ data }">
             <span @click="nodeSelected(data.subjectTerm)" class="node-link">
@@ -22,7 +22,7 @@
     </Column>
     <Column field="object" header="Object"  style="width: 20%">
         <template #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Object" />
+            <InputText size="small" v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Object" />
         </template>
         <template #body="{ data }">
             <span v-if="data.predicateTerm.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' || data.objectTerm.termType === 'Literal'">

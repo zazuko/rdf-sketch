@@ -5,48 +5,100 @@ import {
     TextDocument,
     workspace,
     TextDocumentChangeEvent,
-    Webview
+    Webview,
+    WebviewPanel
 } from "vscode";
+import { rdfFormats } from "./constant/rdf-formats";
+import { UpdateMessage } from "./model/update-message";
+import { updateEventType } from "./constant/update-event-type";
 
 export class RdfPreviewPanel {
 
     public static readonly viewType = 'rdfPreview';
+
+    private static lastMessage: UpdateMessage | null = null;
+    private static panel: WebviewPanel | null = null;
 
     public static show(extensionUri: Uri) {
         const column = window.activeTextEditor
             ? window.activeTextEditor.viewColumn
             : undefined;
 
+
         const editor = window.activeTextEditor?.document;
 
-        const panel = window.createWebviewPanel(
-            RdfPreviewPanel.viewType,
-            'RDF preview',
-            {
-                preserveFocus: true,
-                viewColumn: column ? column + 1 : ViewColumn.One,
-            },
-            {
-                // Enable scripts in the webview
-                enableScripts: true
-            }
-        );
-
-        const updateWebview = (document: TextDocument) => {
-            const content = document.getText();
-        };
-
-
-        workspace.onDidChangeTextDocument((textDocumentChangeEvent: TextDocumentChangeEvent) => {
-            if (textDocumentChangeEvent.document !== editor) {
+        if (this.panel) {
+            console.log('panel exists');
+            this.panel.reveal(column ? column + 1 : ViewColumn.One);
+            if (this.lastMessage && editor) {
+                console.log('update content');
+                this.panel.webview.postMessage({ type: 'updateContentVsCodeEvent', content: this.lastMessage });
                 return;
             }
+        } else {
 
-            updateWebview(textDocumentChangeEvent.document);
-        });
+            this.panel = window.createWebviewPanel(
+                RdfPreviewPanel.viewType,
+                'RDF Sketch',
+                {
+                    preserveFocus: true,
+                    viewColumn: column ? column + 1 : ViewColumn.One,
+                },
+                {
+                    // Enable scripts in the webview
+                    enableScripts: true
+                }
+            );
 
-        if (editor) {
-            updateWebview(editor);
+            const updateWebview = (document: TextDocument) => {
+                const content = document.getText();
+                this.panel!.webview.html = this._getHtmlForWebview(this.panel!.webview, extensionUri, content);
+                setTimeout(() => {
+                    updateWebviewContent(document);
+                }, 1);
+            };
+
+
+            const updateWebviewContent = (document: TextDocument) => {
+                const rdfString = document.getText();
+                const language = document.languageId;
+                const rdfFormatForVscodeLanguage = rdfFormats.find((format) => format.vscodeLanguageId === language);
+
+
+                if (!rdfFormatForVscodeLanguage) {
+                    window.showErrorMessage(`No RDF format found for language ${language}`);
+                    return;
+                }
+
+                const content: UpdateMessage = {
+                    rdfString,
+                    contentType: rdfFormatForVscodeLanguage.contentType
+                };
+                this.lastMessage = content;
+                this.panel!.webview.postMessage({ type: 'updateContentVsCodeEvent', content: content });
+            };
+
+            workspace.onDidChangeTextDocument((textDocumentChangeEvent: TextDocumentChangeEvent) => {
+                if (textDocumentChangeEvent.document !== editor) {
+                    return;
+                }
+
+                updateWebviewContent(textDocumentChangeEvent.document);
+            });
+
+
+            if (editor) {
+                updateWebview(editor);
+            }
+
+            this.panel.onDidChangeViewState(
+                e => {
+                    const panel = e.webviewPanel;
+                    console.log(panel.visible);
+                    console.log('onDidChangeViewState', e);
+                },
+                null
+            );
         }
     }
 
@@ -60,19 +112,34 @@ export class RdfPreviewPanel {
 
         const themeClass = window.activeColorTheme.kind === 2 ? 'dark' : 'light';
 
+        console.log('themeClass', themeClass);
         return `<!DOCTYPE html>
 		<html lang="en" class="${themeClass}">
-		  <head>
-			<meta charset="UTF-8">
-			<meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource} 'unsafe-inline';">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link nonce="${nonce}" rel="stylesheet" href="${stylesUri}" />
-			<title>RDF Sketch preview</title>
-		  </head>
-		  <body>
-          <div id="app"></div>
-          <script nonce="${nonce}" src="${appUri}"></script>
-        </body>
+		    <head>
+			    <meta charset="UTF-8">
+			    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource} 'unsafe-inline';">
+			    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link nonce="${nonce}" rel="stylesheet" href="${stylesUri}" />
+			    <title>RDF Sketch preview</title>
+		    </head>
+		    <body style="margin: 0; padding: 0">
+                <div id="app"></div> 
+                <script type="module" nonce="${nonce}" src="${appUri}"></script>
+                <script>
+                    const vscode = acquireVsCodeApi();
+                    window.addEventListener('message', event => {
+                        const message = event.data;
+                        switch (message.type) {
+                            case 'updateContentVsCodeEvent':
+                                console.log('updateContent', message.content);
+                                // transform vscode event to sketch update event
+                                const event = new CustomEvent('${updateEventType}', { detail: message.content });
+                                window.dispatchEvent(event);
+                                break;
+                        }
+                    });
+                </script>
+            </body>
 		</html>`;
     }
 

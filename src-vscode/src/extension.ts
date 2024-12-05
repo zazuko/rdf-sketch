@@ -15,6 +15,7 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 	const webViewDisposable = commands.registerCommand('rdf-sketch.openPreview', () => {
+		console.log('openPreview');
 		RdfPreviewPanel.show(context.extensionUri);
 	});
 

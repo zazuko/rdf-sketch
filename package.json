@@ -23,6 +23,7 @@
     "elkjs": "^0.9.3",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.1",
+    "util": "^0.12.5",
     "vue": "^3.5.12"
   },
   "devDependencies": {

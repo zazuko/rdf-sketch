@@ -1,6 +1,5 @@
 <template>
-  
-   
+    <div style="height: 100%; width:100%">
     <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.05" :max-zoom="10" @node-drag="onNodeDrag" @edge-click="zoomToNode" >
    
       <template #node-custom="customNodeProps">
@@ -10,12 +9,12 @@
       <FloatingEdge v-bind="customEdgeProps" />
     </template>
   </VueFlow>
-
+</div>
 </template>
 
 <script setup lang="ts">
 
-import { computed, ref, watch, nextTick } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import type { Resource } from '@/model/resource.model';
 import type { Dataset } from '@rdfjs/types';
@@ -79,8 +78,9 @@ watch(resources, async (newResources) => {
   nodes.value = (nodesWithLayout as any).nodes as unknown as CustomNode[];
   edges.value = (nodesWithLayout as any).edges as unknown as CustomEdge[];
 
-  await nextTick();
-  fitView();
+  setTimeout(() => {
+		fitView();
+	  }, 0)
 });
 
 function onNodeDrag(nodeDragEvent: NodeDragEvent) {
