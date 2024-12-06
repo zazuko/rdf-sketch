@@ -24,8 +24,17 @@ You can install it directly from the Visual Studio Code Extension tab. It is ava
 3. A new tab will open with the visualization 
 
 # Demo
+The preview is updated on typing.
 
-![sketch-demo](https://github.com/user-attachments/assets/f0e60aa5-adb6-4d14-bf0b-b1e7854887ab)
+![live-update](https://github.com/user-attachments/assets/000f9413-921a-41db-b32c-a61c1e7bb635)
+
+You can click on objects of a triple to navigate to the corresponding node. And you can click on edges to move to the source node. 
+
+![navigate](https://github.com/user-attachments/assets/f2804dbd-2fa0-4361-8cb8-d867443a6cdb)
+
+You can search by Subject, Predicate, or Object and click to move to the Node. In order to find nodes.
+
+![search](https://github.com/user-attachments/assets/dbf29e5e-f4ea-4040-9aa7-5f6f42ff30f7)
 
 ### Limitations
 
