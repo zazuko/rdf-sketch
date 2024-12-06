@@ -80,7 +80,7 @@ watch(resources, async (newResources) => {
 
   setTimeout(() => {
 		fitView();
-	  }, 0)
+	  }, 100)
 });
 
 function onNodeDrag(nodeDragEvent: NodeDragEvent) {
