@@ -36,17 +36,16 @@ You can search by Subject, Predicate, or Object and click to move to the Node. I
 
 ![search](https://github.com/user-attachments/assets/dbf29e5e-f4ea-4040-9aa7-5f6f42ff30f7)
 
+
+## Supported RDF formats
+
+* Turtle
+* NTriples
+* NQuads
+* JSONLD
+* Trig
+
 ### Limitations
 
-* Currently, it only supports N3/Turtle RDF serializations.
 * While you can move around boxes, the layout will not persist. Every time something in the data changes, it will auto-layout again and discard what you did before.
 * [YMMV](https://www.urbandictionary.com/define.php?term=ymmv) regarding how much data and what kind of graph you can visualize in a useful way.
-
-## Development
-
-To start the extension from this repository:
-
-- Open Visual Studio Code for this repository
-- Open debug panel
-- Hit *Run extension* on the upper right corner
-- To open dev tools: `Ctrl+P` and toggle developer tools
