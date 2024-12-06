@@ -25,17 +25,13 @@ You can install it directly from the Visual Studio Code Extension tab. It is ava
 
 # Demo
 The preview is updated on typing.
-
-![live-update](https://github.com/user-attachments/assets/000f9413-921a-41db-b32c-a61c1e7bb635)
+![live-update](https://github.com/user-attachments/assets/6c59aa96-e60d-4c16-acdf-a286a3d63e12)
 
 You can click on objects of a triple to navigate to the corresponding node. And you can click on edges to move to the source node. 
-
-![navigate](https://github.com/user-attachments/assets/f2804dbd-2fa0-4361-8cb8-d867443a6cdb)
+![navigate](https://github.com/user-attachments/assets/66515004-bb57-4608-b6a7-8306ec0eca8f)
 
 You can search by Subject, Predicate, or Object and click to move to the Node. In order to find nodes.
-
-![search](https://github.com/user-attachments/assets/dbf29e5e-f4ea-4040-9aa7-5f6f42ff30f7)
-
+![search](https://github.com/user-attachments/assets/73e3ba40-1b2b-4310-b1ec-dc7a1eb94497)
 
 ## Supported RDF formats
 
