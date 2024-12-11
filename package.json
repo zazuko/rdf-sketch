@@ -1,6 +1,6 @@
 {
   "name": "rdf-sketch",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,16 +15,16 @@
   },
   "dependencies": {
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
-    "@primevue/themes": "^4.2.1",
+    "@primevue/themes": "^4.2.4",
     "@rdfjs-elements/rdf-editor": "^0.5.10",
-    "@vue-flow/core": "^1.41.5",
+    "@vue-flow/core": "^1.41.6",
     "@zazuko/env": "^2.4.2",
     "@zazuko/prefixes": "^2.2.0",
     "elkjs": "^0.9.3",
     "primeicons": "^7.0.0",
-    "primevue": "^4.2.1",
+    "primevue": "^4.2.4",
     "util": "^0.12.5",
-    "vue": "^3.5.12"
+    "vue": "^3.5.13"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",

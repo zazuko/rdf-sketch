@@ -33,3 +33,4 @@ coverage
 
 src-vscode/media/assets/main.js
 src-vscode/media/
+src-vscode/*.vsix

@@ -32,9 +32,6 @@ export function activate(context: ExtensionContext) {
 			window.showInformationMessage('RDF Preview exists.');
 		}
 
-
-
-
 	});
 
 	context.subscriptions.push(webViewDisposable);

@@ -10,7 +10,8 @@ import {
     ExtensionContext,
     TextEditor,
     EventEmitter,
-    Disposable
+    Disposable,
+    WebviewPanelOnDidChangeViewStateEvent
 } from "vscode";
 
 import { rdfFormats } from "./constant/rdf-formats";
@@ -25,6 +26,11 @@ export class RdfPreviewPanel {
     #panel: WebviewPanel | null = null;
     #context: ExtensionContext;
     #textEditor: TextEditor;
+
+    #lastVisibility = false;
+    #lastActive = false;
+    #lastColumn: ViewColumn | undefined = undefined;
+
     readonly #onDidDispose = new EventEmitter<void>();
     readonly #disposables: Disposable[] = [];
 
@@ -49,19 +55,23 @@ export class RdfPreviewPanel {
             this.viewType,
             'RDF Sketch',
             {
-                preserveFocus: true,
+                preserveFocus: false,
                 viewColumn: column ? column + 1 : ViewColumn.One,
             },
             {
-                enableScripts: true
+                enableScripts: true,
+                retainContextWhenHidden: true,
             }
         );
+        this.#lastActive = true;
+        this.#lastVisibility = true;
+        this.#lastColumn = this.#panel.viewColumn;
 
         workspace.onDidChangeTextDocument((textDocumentChangeEvent: TextDocumentChangeEvent) => {
             if (textDocumentChangeEvent.document !== this.#textEditor.document) {
                 return;
             }
-            this.updateWebviewContent(textDocumentChangeEvent.document);
+            this.updateWebviewContent(textDocumentChangeEvent.document, 'documentChange');
         });
 
 
@@ -70,13 +80,27 @@ export class RdfPreviewPanel {
         }
 
         this.#disposables.push(
-            this.#panel.onDidChangeViewState(e => {
+            this.#panel.onDidChangeViewState((e: WebviewPanelOnDidChangeViewStateEvent) => {
                 const panel = e.webviewPanel;
-                if (panel.visible && this.#lastMessage !== null) {
+
+                /**
+                 * I think this is a bug in vscode.
+                 * This condition is based on testing the event behavior and has not any real logic behind it.
+                 * It should update the panel only if it's detached from the editor (a separate widow).
+                 * Only resend the panel content if ...
+                 */
+                if (!this.#hasVisibilityChanged(panel.visible) &&
+                    this.#hasActiveChanged(panel.active) &&
+                    this.#hasColumnChanged(panel.viewColumn) &&
+                    this.#lastMessage !== null) {
                     this.#panel!.webview.postMessage({ type: 'updateContentVsCodeEvent', content: this.#lastMessage });
                 }
-            }
-            )
+
+                this.#lastActive = panel.active;
+                this.#lastVisibility = panel.visible;
+                this.#lastColumn = panel.viewColumn;
+            })
+
         );
 
         this.#disposables.push(
@@ -88,17 +112,21 @@ export class RdfPreviewPanel {
 
 
 
+
+
+
     }
 
     updateWebview(document: TextDocument) {
         const content = document.getText();
         this.#panel!.webview.html = this.#getHtmlForWebview(this.#panel!.webview, this.#context.extensionUri, content);
+
         setTimeout(() => {
-            this.updateWebviewContent(document);
+            this.updateWebviewContent(document, 'initial');
         }, 1);
     };
 
-    updateWebviewContent = (document: TextDocument) => {
+    updateWebviewContent = (document: TextDocument, reason: string) => {
         const rdfString = document.getText();
         const language = document.languageId;
         const rdfFormatForVscodeLanguage = rdfFormats.find((format) => format.vscodeLanguageId === language);
@@ -150,9 +178,19 @@ export class RdfPreviewPanel {
                                     // transform vscode event to sketch update event
                                     const event = new CustomEvent('${updateEventType}', { detail: message.content });
                                     window.dispatchEvent(event);
+                                    localStorage.setItem('lastUpdateMessage', JSON.stringify(message.content));
+                                    console.log('test', localStorage.getItem('lastUpdateMessage'));
                                     break;
                             }
                         });
+                    </script>
+                    <script>
+                    window.addEventListener('load', () => {
+                        console.log('Webview reloaded');
+                        const lastUpdateMessage = localStorage.getItem('lastUpdateMessage');
+                        console.log('lastUpdateMessage', lastUpdateMessage);   
+                        
+                    });
                     </script>
                 </body>
             </html>`;
@@ -177,6 +215,18 @@ export class RdfPreviewPanel {
                 disposable.dispose();
             }
         }
+    }
+
+    #hasColumnChanged(currentColumn: ViewColumn | undefined): Boolean {
+        return this.#lastColumn !== currentColumn;
+    }
+
+    #hasVisibilityChanged(currentState: Boolean): Boolean {
+        return this.#lastVisibility !== currentState;
+    }
+
+    #hasActiveChanged(currentState: Boolean): Boolean {
+        return this.#lastActive !== currentState;
     }
 
 }
