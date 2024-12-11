@@ -1,9 +1,7 @@
 # Change Log
 
-All notable changes to the "rdf-sketch" extension will be documented in this file.
+## 1.0.1
+- Simplified jsonld support
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+## 1.0.0
+- New release with a lot of changes
