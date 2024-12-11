@@ -128,12 +128,17 @@ export class RdfPreviewPanel {
 
     updateWebviewContent = (document: TextDocument, reason: string) => {
         const rdfString = document.getText();
-        const language = document.languageId;
-        const rdfFormatForVscodeLanguage = rdfFormats.find((format) => format.vscodeLanguageId === language);
+        const languageId = document.languageId;
+        const fileExtension = document.fileName.split('.').pop();
 
+        let rdfFormatForVscodeLanguage = rdfFormats.find((format) => format.vscodeLanguageId === languageId);
+
+        if (rdfFormatForVscodeLanguage === undefined) {
+            rdfFormatForVscodeLanguage = rdfFormats.find((format) => format.vscodeFileExtension === fileExtension);
+        }
 
         if (!rdfFormatForVscodeLanguage) {
-            window.showErrorMessage(`No RDF format found for language ${language}`);
+            window.showErrorMessage(`No RDF format found for language ${languageId} and file extension ${fileExtension}`);
             return;
         }
 

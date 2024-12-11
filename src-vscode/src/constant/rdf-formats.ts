@@ -14,30 +14,35 @@ export const rdfFormats: RdfFormat[] = [
         name: 'Turtle',
         type: RdfSerializationType.Turtle,
         vscodeLanguageId: 'turtle',
+        vscodeFileExtension: 'ttl',
     },
     {
         contentType: RdfSerializationType.JsonLD,
         name: 'JSON-LD',
         type: RdfSerializationType.JsonLD,
         vscodeLanguageId: 'jsonld',
+        vscodeFileExtension: 'jsonld',
     },
     {
         contentType: RdfSerializationType.Trig,
         name: 'TriG',
         type: RdfSerializationType.Trig,
         vscodeLanguageId: 'trig',
+        vscodeFileExtension: 'trig'
     },
     {
         contentType: RdfSerializationType.NQuads,
         name: 'N-Quads',
         type: RdfSerializationType.NQuads,
         vscodeLanguageId: 'n-quads',
+        vscodeFileExtension: 'nq'
     },
     {
         contentType: RdfSerializationType.NTriples,
         name: 'N-Triples',
         type: RdfSerializationType.NTriples,
         vscodeLanguageId: 'ntriples',
+        vscodeFileExtension: 'nt'
     },
     /*  {
           contentType: RdfSerializationType.N3,
@@ -60,5 +65,6 @@ export interface RdfFormat {
     name: string;
     type: RdfSerializationType;
     vscodeLanguageId: string;
+    vscodeFileExtension: string;
 }
 
