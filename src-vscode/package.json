@@ -2,7 +2,7 @@
   "name": "vscode-rdf-sketch",
   "displayName": "RDF Sketch",
   "description": "Graphical rendering of RDF data",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "icon": "images/zazuko.png",
   "publisher": "Zazuko",
@@ -35,7 +35,7 @@
     "menus": {
       "editor/title": [
         {
-          "when": "resourceLangId == turtle || resourceLangId === n-quads || resourceLangId == ntriples || resourceLangId == rdf-xml || resourceLangId == trig || resourceExtname == .jsonld",
+          "when": "resourceLangId == turtle || resourceExtname == .ttl || resourceLangId === n-quads || resourceExtname == .nq || resourceLangId == ntriples || resourceExtname == .nt || resourceLangId == rdf-xml || resourceExtname == .rdf || resourceLangId == trig || resourceExtname == .trig || resourceExtname == .jsonld",
           "command": "rdf-sketch.openPreview",
           "group": "navigation",
           "icon": "$(open-preview)",
