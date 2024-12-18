@@ -20,8 +20,9 @@ You can install it directly from the Visual Studio Code Extension tab. It is ava
 ## Usage
 
 1. Open an RDF file in Visual Studio Code
-2. Then click the preview icon on the top right corner of the editor ![Preview Button](images/preview-button.png)
-3. A new tab will open with the visualization 
+2. Then click the preview icon on the top right corner of the editor ![preview-button](https://github.com/user-attachments/assets/a9ea1a28-3fd1-43bd-a1f7-065fb2e7ef3a)
+
+4. A new tab will open with the visualization 
 
 # Demo
 The preview is updated on typing.
