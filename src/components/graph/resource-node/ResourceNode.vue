@@ -6,6 +6,7 @@ import { Handle, Position, useVueFlow } from '@vue-flow/core'
 
 import RdfTerm from '../../RdfTerm.vue'
 import type { Term } from '@rdfjs/types';
+import { Avatar,AvatarGroup } from 'primevue';
 
 const { fitView, nodeLookup} = useVueFlow()
 
@@ -35,10 +36,16 @@ function zoomToNode(term: Term) {
 
       <header class="resource-card-header">
 
-        <h3 class="resource-title">
+        <AvatarGroup>
+            <Avatar v-for="(avatar, index) in props.data.resource.avatars" :key="index" :label="avatar.label" :style="{ backgroundColor: avatar.color, color: 'black', borderColor: 'rgba(0,0,0,0)', opacity: 0.8 }" size="large" shape="circle"/>
+        </AvatarGroup>
+        <div class="resource-title">
+          <div>
           {{ props.data.resource.name }}
-
-        </h3>
+          </div>
+      
+        </div>
+       
       
       </header>
       <div class="table-container">
@@ -85,18 +92,17 @@ function zoomToNode(term: Term) {
 .resource-card-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: .5rem;
-    padding-bottom: .5rem;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 1rem;
     background-color: gray;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
 
 .resource-title {
-  font-weight: bold;
+  display: flex;
+  flex-direction: column;
 }
 
 table {

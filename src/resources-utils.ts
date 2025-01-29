@@ -14,7 +14,15 @@ export function resourcesFromDataset(dataset: Dataset): Resource[] {
     const nodeSet = new TermSet([...extractedSubjects, ...extractedObject])
 
     const resources = [...nodeSet].map(node => {
-        const quads = dataset.match(node)
+        const quads = dataset.match(node);
+        const rdfClasses = [...quads].filter(quad => quad.predicate.equals(rdfEnvironment.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))).map(quad => quad.object.value);
+        const avatars = rdfClasses.map(rdfClass => {
+            return {
+                label: mapTypeToLabel(rdfClass),
+                color: mapTypeToColor(rdfClass),
+                iri: rdfClass
+            }
+        });
         const properties = [...quads].reduce((acc, { predicate, object }) => {
             if (!acc.has(predicate.value)) {
                 const property = {
@@ -40,7 +48,8 @@ export function resourcesFromDataset(dataset: Dataset): Resource[] {
             id: node.value === '' ? '_:nobody' : node.value,
             term: node,
             name: shrinkTerm(node),
-            properties: orderedProperties
+            properties: orderedProperties,
+            avatars
         } as Resource
     });
     return resources
@@ -73,4 +82,35 @@ export function linksFromResources(resources: Resource[]): Link[] {
         },
             []);
     return links
+}
+
+export const colorPalette = ["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78"];
+
+export function mapTypeToColor(typeIri: string): string {
+    const typeHash = Array.from(typeIri).reduce((hash, char) => {
+        return char.charCodeAt(0) + ((hash << 5) - hash);
+    }, 0);
+
+    const colorIndex = Math.abs(typeHash) % colorPalette.length;
+    return colorPalette[colorIndex];
+}
+function mapTypeToLabel(typeIri: string): string {
+    const iriParts = typeIri.split(/[#\/]/).filter(Boolean);
+    const lastPart = iriParts[iriParts.length - 1];
+
+    const cc = lastPart.replace(/[a-z]/g, '');
+    console.log(lastPart);
+    console.log(cc);
+    if (cc.length > 1) {
+
+        return cc.slice(0, 2);
+    }
+    const label = lastPart.replace(/([a-z])([A-Z])/g, '$1 $2')
+        .split(/[^a-zA-Z0-9]/)
+        .filter(Boolean)
+        .map(part => part[0].toUpperCase() + (part[1] ? part[1].toLowerCase() : ''))
+        .join('')
+        .slice(0, 2);
+
+    return label;
 }

@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.0.3
+- Fix missing icon in readme.md
+
 ## 1.0.2
 - Activate the extension by file extension and not just langageId 
 
