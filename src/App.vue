@@ -7,6 +7,7 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Select from 'primevue/select';
 import Dialog from 'primevue/dialog';
+import Drawer from 'primevue/drawer';
 
 import RdfEditor from './components/RdfEditor.vue';
 import type {  RdfData } from './components/RdfEditor.vue';
@@ -30,7 +31,9 @@ const rdfText = ref<string>('');
 const currentSerialization = computed(() => selectedFormat.value.type);
 const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 const hideEditorSplitterPanel = ref(false);
-const hideSearchPanel = ref(true);
+const showTable = ref(false);
+const showSearchPanel = ref(false);
+
 const showAboutDialog = ref(false);
 
 function onQuadsChanged(rdfData: RdfData) {
@@ -47,7 +50,7 @@ function makeEditorBig() {
 }
 
 function toggleSearch () {
-  hideSearchPanel.value = !hideSearchPanel.value;
+  showSearchPanel.value = !showSearchPanel.value;
 }
 
 function onFormatChange(rdfSerializationType: RdfSerializationType) {
@@ -110,15 +113,27 @@ function onNdeSelected(term: Term) {
       <GraphView :dataset="dataset" />
     </SplitterPanel>
 
-    <SplitterPanel v-if="!hideSearchPanel">
-      <SPOSearch :dataset="dataset" @selected="onNdeSelected"/>
-    </SplitterPanel>
-
   </Splitter>
 
 
+  <Drawer v-model:visible="showSearchPanel" header="SPO Search" :modal="false" position="bottom" :dismissable="false" style="height: 40vh" :pt="{
+        root: {
+            style: 'padding: 0;'
+        },
+        content: {
+            style: 'padding: 0;'
+        },
+        title: {
+          style: 'font-size: 16px; font-weight: 600;'
+        },
+        header: {
+            style: 'padding-left: 16px; padding-top:0; padding-bottom:0; padding-right: 0px; '
+            
+        }}">
+    <SPOSearch :dataset="dataset" @selected="onNdeSelected"/>
+  </Drawer>
 
-  <Dialog v-model:visible="showAboutDialog" modal header="Zazuko RDF Sketch" :style="{ width: '60rem' }">
+  <Dialog v-model:visible="showAboutDialog" header="Zazuko RDF Sketch" :style="{ width: '60rem' }">
     <div style="display: flex; flex-direction: row; gap: 24px">  
       <img src="/img/icons/zazuko_icon.svg" alt="Zazuko Logo" style="width: 100px;">
 
