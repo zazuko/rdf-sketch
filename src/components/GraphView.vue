@@ -1,6 +1,6 @@
 <template>
     <div style="height: 100%; width:100%">
-    <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.05" :max-zoom="10" @node-drag="onNodeDrag" @edge-click="zoomToNode" >
+    <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.00005" :max-zoom="10" @node-drag="onNodeDrag" @edge-click="zoomToNode" >
    
       <template #node-custom="customNodeProps">
       <ResourceNode v-bind="customNodeProps" />

@@ -50,6 +50,15 @@ function makeEditorBig() {
 
 function toggleSearch () {
   showSearchPanel.value = !showSearchPanel.value;
+  if (showSearchPanel.value) {
+    hideEditorSplitterPanel.value = true;
+    window.setTimeout(() => {
+      fitView({
+        duration: 1000, // use this if you want a smooth transition to the node
+        padding: 0.3 // use this for some padding around the node
+      })
+    })
+  }
 }
 
 function onFormatChange(rdfSerializationType: RdfSerializationType) {
@@ -102,7 +111,7 @@ function onNdeSelected(term: Term) {
     </template>
   </Toolbar>
 
-  <Splitter style="height: calc(100vh - (67.5px + ( 2 * 8px) + 8px) ); margin-top: 8px" class="mb-8">
+  <Splitter :style="{ height: showSearchPanel ? 'calc(60vh - (67.5px + ( 2 * 8px) + 8px) )' : 'calc(100vh - (67.5px + ( 2 * 8px) + 8px) )' }" style="margin-top: 8px;" class="mb-8">
 
     <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
       <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="onFormatChange"/>
