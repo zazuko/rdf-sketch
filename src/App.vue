@@ -27,15 +27,22 @@ const { fitView, nodeLookup} = useVueFlow()
 const selectedFormat = ref<RdfFormat>(rdfFormats.find(f => f.type === RdfSerializationType.Turtle) ?? rdfFormats[0]);
 const rdfFormatOptions = ref<RdfFormat[]>(rdfFormats);
 const rdfText = ref<string>('');
+let rdfSimpleHash = 0;
 
 const currentSerialization = computed(() => selectedFormat.value.type);
 const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 const hideEditorSplitterPanel = ref(false);
 const showSearchPanel = ref(false);
-
 const showAboutDialog = ref(false);
 
 function onQuadsChanged(rdfData: RdfData) {
+  const hash = simpleHash(rdfData.rdfText);
+  if(hash === rdfSimpleHash) {
+    // dont update the ui if nothing has changed
+    return;
+  }
+  rdfSimpleHash = hash;
+
   const newDataset = rdfEnvironment.dataset(rdfData.quads) as unknown as  Dataset;
   prefixMap.update(rdfData.prefix);
   rdfText.value = rdfData.rdfText;
@@ -52,13 +59,8 @@ function toggleSearch () {
   showSearchPanel.value = !showSearchPanel.value;
   if (showSearchPanel.value) {
     hideEditorSplitterPanel.value = true;
-    window.setTimeout(() => {
-      fitView({
-        duration: 1000, // use this if you want a smooth transition to the node
-        padding: 0.3 // use this for some padding around the node
-      })
-    })
-  }
+  } 
+ 
 }
 
 function onFormatChange(rdfSerializationType: RdfSerializationType) {
@@ -82,7 +84,22 @@ function onNdeSelected(term: Term) {
 	})
 }
 
+function zoomFitView () {
+  setTimeout(() => {
+		fitView({
+      duration: 1000, // use this if you want a smooth transition to the node
+      padding: 0.3 // use this for some padding around the node
+})}, 100)
+}
 
+function simpleHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0; // Convert to 32-bit integer
+    }
+    return hash >>> 0; // Convert to unsigned integer
+}
 
 </script>
 
@@ -102,6 +119,7 @@ function onNdeSelected(term: Term) {
 
     <template #end>
       <Button icon="pi pi-search" class="mr-2" severity="secondary" @click="toggleSearch" text></Button>
+      <Button icon="pi pi-arrow-up-right-and-arrow-down-left-from-center" class="mr-2" severity="secondary" @click="zoomFitView" text></Button>
       <ShareButton :format="currentSerialization" :rdf-text="rdfText"></ShareButton>
       <Button icon="pi pi-lightbulb" class="mr-2" severity="secondary" @click="showAboutDialog = !showAboutDialog" text></Button>
       <Button as="a" icon="pi pi-github" class="mr-2" severity="secondary" href="https://github.com/zazuko/rdf-sketch"
@@ -118,6 +136,7 @@ function onNdeSelected(term: Term) {
     </SplitterPanel>
 
     <SplitterPanel class="flex items-center justify-center">
+
       <GraphView :dataset="dataset" />
     </SplitterPanel>
 
