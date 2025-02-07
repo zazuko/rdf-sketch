@@ -1,5 +1,8 @@
 <template>
-<DataTable  v-model:filters="filters" filterDisplay="row" :value="spo" scrollable scrollHeight="flex">
+<ProgressSpinner v-if="!spo" />
+
+
+<DataTable v-if="spo" v-model:filters="filters" filterDisplay="row" :value="spo" :itemSize="61" scrollable scrollHeight="calc(40vh - 42px)" :virtualScrollerOptions="{ itemSize: 61 }" >
     <Column field="subject" header="Subject" style="width: 20%">  
         <template #filter="{ filterModel, filterCallback }">
             <InputText size="small" v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Subject" />
@@ -25,7 +28,7 @@
             <InputText size="small" v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Object" />
         </template>
         <template #body="{ data }">
-            <span v-if="data.predicateTerm.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' || data.objectTerm.termType === 'Literal'">
+            <span class="row" v-if="data.predicateTerm.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' || data.objectTerm.termType === 'Literal'">
                 {{ data.object }}
             </span>
             <span v-else @click="nodeSelected(data.objectTerm)" class="node-link">
@@ -43,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import ProgressSpinner from 'primevue/progressspinner';
 
 import type { Dataset, Term } from '@rdfjs/types';
 import { computed, ref } from 'vue'

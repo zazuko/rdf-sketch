@@ -99,8 +99,6 @@ function mapTypeToLabel(typeIri: string): string {
     const lastPart = iriParts[iriParts.length - 1];
 
     const cc = lastPart.replace(/[a-z]/g, '');
-    console.log(lastPart);
-    console.log(cc);
     if (cc.length > 1) {
 
         return cc.slice(0, 2);
