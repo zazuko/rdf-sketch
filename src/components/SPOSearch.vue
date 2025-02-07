@@ -1,9 +1,7 @@
 <template>
-<ProgressSpinner v-if="!spo" />
 
-
-<DataTable v-if="spo" v-model:filters="filters" filterDisplay="row" :value="spo" :itemSize="61" scrollable scrollHeight="calc(40vh - 42px)" :virtualScrollerOptions="{ itemSize: 61 }" >
-    <Column field="subject" header="Subject" style="width: 20%">  
+<DataTable v-if="spo" v-model:filters="filters" filterDisplay="row" :value="spo" :itemSize="61" scrollable :scrollHeight="props.isVscode ? 'calc(40vh - 0px)' : 'calc(40vh - 42px)'" :virtualScrollerOptions="{ itemSize: 61 }" >
+    <Column field="subject" header="Subject" :style="{ width: hasContext ? '25%' : '33.33%' }">  
         <template #filter="{ filterModel, filterCallback }">
             <InputText size="small" v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Subject" />
         </template>
@@ -13,7 +11,7 @@
             </span>
         </template>
     </Column>
-    <Column field="predicate" header="Predicate" style="width: 20%">
+    <Column field="predicate" header="Predicate" :style="{ width: hasContext ? '25%' : '33.33%' }">
         <template #filter="{ filterModel, filterCallback }">
             <InputText size="small" v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Predicate" />
         </template>
@@ -23,7 +21,7 @@
             </span>
         </template>
     </Column>
-    <Column field="object" header="Object"  style="width: 20%">
+    <Column field="object" header="Object" :style="{ width: hasContext ? '25%' : '33.33%' }">
         <template #filter="{ filterModel, filterCallback }">
             <InputText size="small" v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Object" />
         </template>
@@ -36,7 +34,7 @@
             </span>
         </template>
     </Column>
-    <Column v-if="hasContext" field="context" header="Context" style="width: 20%">
+    <Column v-if="hasContext" field="context" header="Context" style="width: 33.33%">
         <template #filter="{ filterModel, filterCallback }">
             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search Context aka Named Graph" />
         </template>
@@ -46,7 +44,6 @@
 </template>
 
 <script setup lang="ts">
-import ProgressSpinner from 'primevue/progressspinner';
 
 import type { Dataset, Term } from '@rdfjs/types';
 import { computed, ref } from 'vue'
@@ -68,6 +65,7 @@ interface SPO {
 
 interface GraphViewProps {
   dataset: Dataset,
+  isVscode: boolean
 }
 
 const props = defineProps<GraphViewProps>();

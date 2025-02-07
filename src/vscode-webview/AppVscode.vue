@@ -127,7 +127,7 @@ onBeforeMount(() => {
 
     <SplitterPanel v-if="!hideSearchPanel" >
         <div class="search">
-            <SPOSearch :dataset="dataset" @selected="onNdeSelected"/>
+            <SPOSearch :dataset="dataset" :is-vscode="true" @selected="onNdeSelected"/>
         </div>
     </SplitterPanel>
 

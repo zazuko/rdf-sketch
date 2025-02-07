@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.5
+- Improve SPO scroll performance
+
+## 1.0.4
+- Add rdf:type Icon
+
 ## 1.0.3
 - Fix missing icon in readme.md
 

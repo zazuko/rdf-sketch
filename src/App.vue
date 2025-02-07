@@ -157,7 +157,7 @@ function simpleHash(str: string): number {
             style: 'padding-left: 16px; padding-top:0; padding-bottom:0; padding-right: 0px; '
             
         }}">
-    <SPOSearch :dataset="dataset" @selected="onNdeSelected"/>
+    <SPOSearch :dataset="dataset" :is-vscode="false" @selected="onNdeSelected"/>
   </Drawer>
 
   <Dialog v-model:visible="showAboutDialog" header="Zazuko RDF Sketch" :style="{ width: '60rem' }">
