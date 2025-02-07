@@ -31,7 +31,6 @@ const rdfText = ref<string>('');
 const currentSerialization = computed(() => selectedFormat.value.type);
 const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 const hideEditorSplitterPanel = ref(false);
-const showTable = ref(false);
 const showSearchPanel = ref(false);
 
 const showAboutDialog = ref(false);
