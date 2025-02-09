@@ -16,13 +16,14 @@ export function resourcesFromDataset(dataset: Dataset): Resource[] {
     const resources = [...nodeSet].map(node => {
         const quads = dataset.match(node);
         const rdfClasses = [...quads].filter(quad => quad.predicate.equals(rdfEnvironment.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))).map(quad => quad.object.value);
-        const avatars = rdfClasses.map(rdfClass => {
+        const avatarsWithDuplicates = rdfClasses.map(rdfClass => {
             return {
                 label: mapTypeToLabel(rdfClass),
                 color: mapTypeToColor(rdfClass),
                 iri: rdfClass
             }
         });
+        const avatars = avatarsWithDuplicates.filter((avatar, index) => avatarsWithDuplicates.findIndex(a => a.iri === avatar.iri) === index);
         const properties = [...quads].reduce((acc, { predicate, object }) => {
             if (!acc.has(predicate.value)) {
                 const property = {

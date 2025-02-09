@@ -2,7 +2,7 @@
   "name": "vscode-rdf-sketch",
   "displayName": "RDF Sketch",
   "description": "Graphical rendering of RDF data",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "license": "MIT",
   "icon": "images/zazuko.png",
   "publisher": "Zazuko",
