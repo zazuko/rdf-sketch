@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.0.6
+- Update dependencies
+
 ## 1.0.5
 - Improve SPO scroll performance
 - Unique rdf:type Icon
