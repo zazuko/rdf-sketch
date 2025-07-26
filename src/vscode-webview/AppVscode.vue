@@ -117,15 +117,22 @@ onBeforeMount(() => {
   <Button style="position: absolute; top: 15px; left:15px; z-index: 9000;" class="mr-2" severity="secondary" @click="toggleSearch" rounded text>
     <svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true" class="DocSearch-Search-Icon"><path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg>
   </Button>
-   
-  <Splitter :unstyled="true" style="height: 100vh; width: 100vw" layout="vertical" >
-    <SplitterPanel>
-        <div style="height:100%; width: 100%">
+
+  <Splitter :unstyled="true" style="height: 100vh; width: 100vw; flex-direction: column; display: flex; flex-wrap: nowrap;" layout="vertical" >
+    <SplitterPanel class="flex items-center justify-center" style="display: flex; align-items: center; justify-content: center; flex-grow: 1;">
+                  <GraphView :dataset="dataset"/>
+
+      <!-- 
+        <div 
+          class="graph-panel"
+          :class="{'full-height': hideSearchPanel}" 
+        >
             <GraphView :dataset="dataset"/>
         </div>  
+        -->
      </SplitterPanel>
 
-    <SplitterPanel v-if="!hideSearchPanel" >
+    <SplitterPanel  v-if="!hideSearchPanel" style="display: flex; align-items: center; justify-content: center; flex-grow: 1;">
         <div class="search">
             <SPOSearch :dataset="dataset" :is-vscode="true" @selected="onNdeSelected"/>
         </div>
@@ -141,10 +148,20 @@ onBeforeMount(() => {
   background-color: white;
   max-height: 40vh; 
   height: 40vh;
+  width: 100%;
   border-top: solid 1px var(--p-datatable-header-cell-border-color);
 }
 
 .vscode-dark .search {
   background-color: rgb(24, 24, 27);
+}
+
+graph-panel {
+  height: 100% ;
+  width: 100vw !important;
+}
+.full-height {
+  height: 100vh !important;
+  width: 100vw !important;
 }
 </style>
