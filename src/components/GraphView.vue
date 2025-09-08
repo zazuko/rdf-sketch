@@ -1,6 +1,14 @@
 <template>
     <div style="height: 100%; width:100%">
-    <VueFlow :nodes="nodes" :edges="edges" :min-zoom="0.00005" :max-zoom="10" @node-drag="onNodeDrag" @edge-click="zoomToNode" >
+    <VueFlow 
+    :nodes="nodes" 
+    :edges="edges" 
+    :min-zoom="0.00005" 
+    :max-zoom="10"
+    :fit-view-on-init="true"
+    @node-drag="onNodeDrag"
+    @edge-click="zoomToNode" 
+    >
    
       <template #node-custom="customNodeProps">
       <ResourceNode v-bind="customNodeProps" />
@@ -53,8 +61,8 @@ const links = computed(() => {
 const nodes = ref<CustomNode[]>([])
 const edges = ref<CustomEdge[]>([])
 
-watch(resources, async (newResources) => {
-  const nodesWithoutLayout = newResources.map(resource => ({
+watch(links, async (newLinks) => {
+  const nodesWithoutLayout = resources.value.map(resource => ({
     id: resource.id,
     type: 'custom',
     position: { x: 0, y: 0 },
@@ -63,7 +71,7 @@ watch(resources, async (newResources) => {
     },
   }));
 
-  const newEdges = links.value.map(link => ({
+  const newEdges = newLinks.map(link => ({
     id: `${link.source}-${link.sourceProperty}-${link.target}`,
     source: link.source,
     target: link.target,
@@ -78,10 +86,7 @@ watch(resources, async (newResources) => {
   nodes.value = (nodesWithLayout as any).nodes as unknown as CustomNode[];
   edges.value = (nodesWithLayout as any).edges as unknown as CustomEdge[];
 
-  setTimeout(() => {
-		fitView();
-	  }, 100)
-});
+},{ immediate: true });
 
 function onNodeDrag(nodeDragEvent: NodeDragEvent) {
   const focusNode = nodeDragEvent.node;

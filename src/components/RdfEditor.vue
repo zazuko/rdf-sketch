@@ -104,9 +104,13 @@ onMounted(() => {
   const storedPrefixList = JSON.parse( localStorage.getItem(localStorageKeyPrefixList) ?? '[]');
   if (storedText && storedFormat && rdfFormats.find(f => f.type === storedFormat) && Array.isArray(storedPrefixList)) {
     rdfText.value = storedText;
-    currentSerialization.value = (rdfFormats.find(f => f.type === storedFormat) ?? rdfFormats[0]).type;
     prefixList.value = storedPrefixList;
-    emit('format-change', currentSerialization.value);
+
+    const format = rdfFormats.find(f => f.type === storedFormat);
+    if(format) {
+      currentSerialization.value = format.type;
+      emit('format-change', currentSerialization.value);
+    }
   } else {
     localStorage.removeItem(localStorageKeyText);
     localStorage.removeItem(localStorageKeyFormat);
