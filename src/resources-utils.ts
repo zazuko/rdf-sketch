@@ -7,11 +7,15 @@ import type { Dataset } from "@rdfjs/types";
 
 
 export function resourcesFromDataset(dataset: Dataset): Resource[] {
-    const extractedSubjects = [...dataset].map(quad => quad.subject)
-    const extractedObject = [...dataset].filter(
-        quad => !quad.predicate.equals(rdfEnvironment.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))).map(quad => quad.object).filter(o => o.termType === "BlankNode" || o.termType === "NamedNode")
-
-    const nodeSet = new TermSet([...extractedSubjects, ...extractedObject])
+    const nodeSet = new TermSet();
+    for (const quad of dataset) {
+        nodeSet.add(quad.subject);
+        if (!quad.predicate.equals(rdfEnvironment.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'))) {
+            if (quad.object.termType === "BlankNode" || quad.object.termType === "NamedNode") {
+                nodeSet.add(quad.object);
+            }
+        }
+    }
 
     const resources = [...nodeSet].map(node => {
         const quads = dataset.match(node);
@@ -93,11 +97,11 @@ export function mapTypeToColor(typeIri: string): string {
     }, 0);
 
     const colorIndex = Math.abs(typeHash) % colorPalette.length;
-    return colorPalette[colorIndex];
+    return colorPalette[colorIndex] ?? "#b30000";
 }
 function mapTypeToLabel(typeIri: string): string {
     const iriParts = typeIri.split(/[#\/]/).filter(Boolean);
-    const lastPart = iriParts[iriParts.length - 1];
+    const lastPart = iriParts[iriParts.length - 1] ?? '';
 
     const cc = lastPart.replace(/[a-z]/g, '');
     if (cc.length > 1) {
@@ -107,7 +111,7 @@ function mapTypeToLabel(typeIri: string): string {
     const label = lastPart.replace(/([a-z])([A-Z])/g, '$1 $2')
         .split(/[^a-zA-Z0-9]/)
         .filter(Boolean)
-        .map(part => part[0].toUpperCase() + (part[1] ? part[1].toLowerCase() : ''))
+        .map(part => (part[0] ?? '').toUpperCase() + (part[1] ? part[1].toLowerCase() : ''))
         .join('')
         .slice(0, 2);
 
