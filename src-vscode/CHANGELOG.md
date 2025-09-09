@@ -1,6 +1,8 @@
 # Change Log
 
 ## 1.0.6
+- Feature web extension build (you can now use the extension in web based VSCode like github.dev or vscode.dev)
+- Improve rdf to flow conversion performance
 - Update dependencies
 
 ## 1.0.5
