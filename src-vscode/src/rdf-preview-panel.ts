@@ -121,10 +121,15 @@ export class RdfPreviewPanel {
         const content = document.getText();
         this.#panel!.webview.html = this.#getHtmlForWebview(this.#panel!.webview, this.#context.extensionUri, content);
 
-        setTimeout(() => {
-            this.updateWebviewContent(document, 'initial');
-        }, 1);
-    };
+        // Listen for 'ready' message from webview before sending initial content
+        const readyListener = this.#panel!.webview.onDidReceiveMessage((message) => {
+            console.log('Received message from webview:', message);
+            if (message && message.type === 'readyForContent') {
+                this.updateWebviewContent(document, 'initial');
+                readyListener.dispose();
+            }
+        });
+    }
 
     updateWebviewContent = (document: TextDocument, reason: string) => {
         const rdfString = document.getText();
@@ -175,6 +180,10 @@ export class RdfPreviewPanel {
                     <script type="module" nonce="${nonce}" src="${appUri}"></script>
                     <script>
                         const vscode = acquireVsCodeApi();
+                        // Notify extension when webview is ready for content
+                        window.addEventListener('DOMContentLoaded', () => {
+                            vscode.postMessage({ type: 'readyForContent' });
+                        });
                         window.addEventListener('message', event => {
                             const message = event.data;
                             switch (message.type) {

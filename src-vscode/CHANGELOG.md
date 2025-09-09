@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.8
+- Fix webview content not loading on first open
+
+## 1.0.7
+- Lower vscode engine requirement to 1.94.0 to run on gitlab
+
 ## 1.0.6
 - Feature web extension build (you can now use the extension in web based VSCode like github.dev or vscode.dev)
 - Improve rdf to flow conversion performance
