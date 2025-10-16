@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, type VNodeRef } from 'vue';
+import { computed, onMounted, ref, watch, type PropType, type VNodeRef } from 'vue';
 
 import '@rdfjs-elements/rdf-editor';
 
@@ -22,12 +22,12 @@ export interface RdfPrefix {
   uri: string;
 }
 
-interface RdfEditorProps {
-  format: RdfSerializationType;
-}
-
-
-const props = defineProps<RdfEditorProps>()
+const props = defineProps({
+  format: {
+    type: String as PropType<RdfSerializationType>,
+    required: true
+  }
+})
 
 
 const emit = defineEmits<{

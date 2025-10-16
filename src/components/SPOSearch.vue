@@ -62,7 +62,7 @@
 <script setup lang="ts">
 
 import type { Dataset, Term } from '@rdfjs/types';
-import { computed, ref } from 'vue'
+import { computed, ref, type PropType } from 'vue'
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { shrinkTerm } from '@/rdf/shrink-term';
@@ -79,12 +79,17 @@ interface SPO {
     context: string,
 }
 
-interface GraphViewProps {
-  dataset: Dataset,
-  isVscode: boolean
-}
 
-const props = defineProps<GraphViewProps>();
+const props = defineProps({
+    dataset: {
+        type: Object as PropType<Dataset>,
+        required: true
+    },
+    isVscode: {
+        type: Boolean,
+        required: true
+    }
+});
 
 
 const emit = defineEmits<{
