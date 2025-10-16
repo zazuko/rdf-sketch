@@ -9,7 +9,6 @@ import type { Quad} from '@rdfjs/types';
 import { localStorageKeyFormat, localStorageKeyPrefixList, localStorageKeyText } from '@/constant/local-storage-keys';
 import { MAX_TRIPLES_TO_BE_STORED } from '@/constant/min-max';
 
-
 export interface RdfData {
     quads: Quad[];
     rdfText: string;
@@ -29,56 +28,23 @@ const props = defineProps({
   }
 })
 
-
 const emit = defineEmits<{
   (event: 'change', data: RdfData): void;
   (event: 'format-change', format: RdfSerializationType): void;
 }>();
 
+
+const defaultPrefixes = "rdf,rdfs,sh";
+const rdfText = ref<string>('');
 const prefixList = ref<RdfPrefix[]>([]);
-const editorElement = ref<VNodeRef |null>(null);
 const currentSerialization = ref<RdfSerializationType>(RdfSerializationType.Turtle);
 
-watch(() => props.format, (newFormat) => {
-  if (newFormat !== currentSerialization.value) {
-    currentSerialization.value = newFormat;
-  }
-});
+const editorElement = ref<VNodeRef |null>(null);
 
-const rdfText = ref<string>('');
-
-function onParsingFailed(e: CustomEvent) {
-  console.error('Parsing failed', e.detail);
-  
-}
-
-function onQuadsChanged(e: CustomEvent) {
- 
-  const text = (editorElement.value as unknown as any)?.codeMirror?.value;
-  const quads = e.detail.value as Quad[];
-  const rdfData: RdfData = {
-      quads: quads,
-      rdfText: text,
-      serializationFormat: props.format,
-      prefix: prefixList.value
-  };
-
-  if (quads.length < MAX_TRIPLES_TO_BE_STORED) {
-    localStorage.setItem(localStorageKeyText, rdfData.rdfText);
-    localStorage.setItem(localStorageKeyFormat, rdfData.serializationFormat);
-    localStorage.setItem(localStorageKeyPrefixList, JSON.stringify(prefixList.value));
-  }
-    emit('change', rdfData);
-  }
- 
-
-function onPrefixesParsed(e: CustomEvent) {
-  for (const [prefix, val] of Object.entries(e.detail.prefixes)) {
-    const uri = val as string ;
-    prefixList.value.push({ prefix, uri });
-  }   
-}
-
+/**
+ * List of standard prefixes supported by the editor and custom prefixes. Custom prefixes are those extracted from the RDF document, 
+ * in addition to the standard prefixes supported by the editor.
+ */
 const customPrefixes = computed(() => {
   const prefixMap: Record<string, string> = {};
   prefixList.value.forEach((p) => {
@@ -88,14 +54,68 @@ const customPrefixes = computed(() => {
     prefixMap[p.prefix] = (p.uri as unknown as any).value;
   }
   });
-  prefixes.split(',').forEach((p) => {
+  defaultPrefixes.split(',').forEach((p) => {
     delete prefixMap[p];
   });
  
   return prefixMap;
 });
 
-const prefixes = "rdf,rdfs,sh";
+
+
+
+watch(() => props.format, (newFormat) => {
+  if (newFormat !== currentSerialization.value) {
+    currentSerialization.value = newFormat;
+  }
+});
+
+
+function logParseErrorToConsole(e: CustomEvent) {
+  console.error('Parsing failed', e.detail);
+  
+}
+
+function emitRdfDataToVisualise(e: CustomEvent) {
+ 
+  const text = (editorElement.value as unknown as any)?.codeMirror?.value;
+  const quads = e.detail.value as Quad[];
+
+  if(quads.length === 0) {
+    resetPrefixList();
+  }
+
+  const rdfData: RdfData = {
+      quads: quads,
+      rdfText: text,
+      serializationFormat: props.format,
+      prefix: prefixList.value
+  };
+
+  if (quads.length < MAX_TRIPLES_TO_BE_STORED) {
+    // store in local storage if not too big
+    localStorage.setItem(localStorageKeyText, rdfData.rdfText);
+    localStorage.setItem(localStorageKeyFormat, rdfData.serializationFormat);
+    localStorage.setItem(localStorageKeyPrefixList, JSON.stringify(prefixList.value));
+  }
+    emit('change', rdfData);
+  }
+ 
+
+function addPrefix(e: CustomEvent) {
+  for (const [prefix, val] of Object.entries(e.detail.prefixes)) {
+    const uri = val as string ;
+    prefixList.value.push({ prefix, uri });
+  }   
+}
+
+/**
+ * Reset the prefix list and remove it from local storage
+ */
+function resetPrefixList() {
+    localStorage.removeItem(localStorageKeyPrefixList);
+    prefixList.value = [];
+}
 
 onMounted(() => {
   // read previous state from local storage
@@ -119,19 +139,23 @@ onMounted(() => {
 
 });
 
-
-
-
 </script>
 
 <template>
   <div class="editor-container">
-
-  <rdf-editor :value.prop="rdfText" :format="currentSerialization" ref="editorElement" :prefixes="prefixes" :customPrefixes="customPrefixes" auto-parse
-    parseDelay="1000" @parsing-failed="onParsingFailed" @quads-changed="onQuadsChanged"
-    @prefixes-parsed="onPrefixesParsed" />
+    <rdf-editor 
+      ref="editorElement" 
+      auto-parse
+      parseDelay="1000" 
+      :value.prop="rdfText" 
+      :format="currentSerialization" 
+      :prefixes="defaultPrefixes" 
+      :customPrefixes="customPrefixes" 
+      @parsing-failed="logParseErrorToConsole"
+      @quads-changed="emitRdfDataToVisualise"
+      @prefixes-parsed="addPrefix"
+    />
   </div>
-
 </template>
 
 <style scoped>
@@ -142,6 +166,7 @@ onMounted(() => {
   border-bottom-left-radius: 6px;
   overflow: hidden;
 }
+
 rdf-editor {
   height: 100%;
   width: 100%;

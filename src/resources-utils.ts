@@ -3,10 +3,9 @@ import type { Link } from "./model/link.model"
 import type { Resource } from "./model/resource.model"
 import { rdfEnvironment } from './rdf/environment';
 import { shrinkTerm } from "./rdf/shrink-term";
-import type { Dataset } from "@rdfjs/types";
 
 
-export function resourcesFromDataset(dataset: Dataset): Resource[] {
+export function resourcesFromDataset(dataset: ReturnType<typeof rdfEnvironment.dataset>): Resource[] {
     const nodeSet = new TermSet();
     for (const quad of dataset) {
         nodeSet.add(quad.subject);

@@ -15,7 +15,7 @@ import { rdfEnvironment } from './rdf/environment';
 import { RdfSerializationType, rdfFormats} from './constant/rdf-format';
 import type { RdfFormat } from './constant/rdf-format';
 import GraphView from './components/GraphView.vue';
-import type { Dataset, Term } from '@rdfjs/types';
+import type { Term } from '@rdfjs/types';
 
 import { prefixMap } from './rdf/prefix-map'; 
 import SPOSearch from './components/SPOSearch.vue';
@@ -30,7 +30,7 @@ const rdfText = ref<string>('');
 let rdfSimpleHash = 0;
 
 const currentSerialization = computed(() => selectedFormat.value.type);
-const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
+const dataset  = ref(rdfEnvironment.dataset());
 const hideEditorSplitterPanel = ref(false);
 const showSearchPanel = ref(false);
 const showAboutDialog = ref(false);
@@ -43,7 +43,7 @@ function onQuadsChanged(rdfData: RdfData) {
   }
   rdfSimpleHash = hash;
 
-  const newDataset = rdfEnvironment.dataset(rdfData.quads) as unknown as  Dataset;
+  const newDataset = rdfEnvironment.dataset(rdfData.quads);
   prefixMap.update(rdfData.prefix);
   rdfText.value = rdfData.rdfText;
   dataset.value = newDataset;
@@ -134,7 +134,11 @@ function simpleHash(str: string): number {
   <Splitter :style="{ height: showSearchPanel ? 'calc(60vh - (67.5px + ( 2 * 8px) + 8px) )' : 'calc(100vh - (67.5px + ( 2 * 8px) + 8px) )' }" style="margin-top: 8px;" class="mb-8">
 
     <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
-      <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="changeEditorFormat"/>
+      <RdfEditor 
+        :format="currentSerialization"
+        @change="onQuadsChanged" 
+        @format-change="changeEditorFormat"
+      />
     </SplitterPanel>
 
     <SplitterPanel class="flex items-center justify-center">

@@ -25,7 +25,7 @@
 import { computed, ref, watch, type PropType } from 'vue'
 
 import type { Resource } from '@/model/resource.model';
-import type { Dataset } from '@rdfjs/types';
+import { rdfEnvironment } from '../rdf/environment';
 
 import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent, MarkerType, type EdgeMouseEvent} from '@vue-flow/core';
 
@@ -43,7 +43,7 @@ export type CustomEdge = Edge<any, any, CustomEdgeTypes>
 
 const props = defineProps({
   dataset: {
-    type: Object as PropType<Dataset>,
+    type: Object as PropType<ReturnType<typeof rdfEnvironment.dataset>>,
     required: true
   }
 })

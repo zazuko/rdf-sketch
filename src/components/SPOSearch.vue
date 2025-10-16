@@ -61,13 +61,14 @@
 
 <script setup lang="ts">
 
-import type { Dataset, Term } from '@rdfjs/types';
+import type { Term } from '@rdfjs/types';
 import { computed, ref, type PropType } from 'vue'
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { shrinkTerm } from '@/rdf/shrink-term';
 import { FilterMatchMode } from '@primevue/core/api';
 import InputText from 'primevue/inputtext';
+import type { rdfEnvironment } from '@/rdf/environment';
 
 interface SPO {
     subject: string,
@@ -82,7 +83,7 @@ interface SPO {
 
 const props = defineProps({
     dataset: {
-        type: Object as PropType<Dataset>,
+    type: Object as PropType<ReturnType<typeof rdfEnvironment.dataset>>,
         required: true
     },
     isVscode: {
