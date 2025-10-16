@@ -39,7 +39,6 @@ export const rdfFormats: RdfFormat[] = [
           name: 'N3',
           type: RdfSerializationType.N3,
       },*/
-
     {
         contentType: RdfSerializationType.RdfXML,
         name: 'RDF/XML',

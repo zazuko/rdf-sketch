@@ -10,15 +10,16 @@
 
 <script setup lang="ts">
 
-import { computed } from 'vue';
+import { computed, type PropType } from 'vue';
 import type { Term } from '@rdfjs/types';
 import { shrinkTerm } from '@/rdf/shrink-term';
 
-interface RdfTermProps {
-  term: Term
-}
-
-const props = defineProps<RdfTermProps>()
+const props = defineProps({
+  term: {
+    type: Object as PropType<Term>,
+    required: true
+  }
+})
 
 const displayValue = computed(() => {
   return shrinkTerm(props.term)

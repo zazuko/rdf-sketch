@@ -22,17 +22,18 @@
 
 <script setup lang="ts">
 
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, type PropType } from 'vue'
 
 import type { Resource } from '@/model/resource.model';
 import type { Dataset } from '@rdfjs/types';
-import { linksFromResources, resourcesFromDataset } from '../resources-utils';
-import FloatingEdge from './graph/floating-edge/FloatingEdge.vue';
 
 import { VueFlow, useVueFlow, type Node, type Edge, type NodeDragEvent, MarkerType, type EdgeMouseEvent} from '@vue-flow/core';
 
+import { linksFromResources, resourcesFromDataset } from '../resources-utils';
 import { useLayout } from '../layout/use-layout'; 
+
 import ResourceNode  from './graph/resource-node/ResourceNode.vue'
+import FloatingEdge from './graph/floating-edge/FloatingEdge.vue';
 
 
 export type CustomNodeTypes = 'custom' | 'special'
@@ -40,11 +41,13 @@ export type CustomNode = Node<Resource, {}, CustomNodeTypes>
 type CustomEdgeTypes = 'custom' | 'special'
 export type CustomEdge = Edge<any, any, CustomEdgeTypes>
 
-interface GraphViewProps {
-  dataset: Dataset,
-}
+const props = defineProps({
+  dataset: {
+    type: Object as PropType<Dataset>,
+    required: true
+  }
+})
 
-const props = defineProps<GraphViewProps>()
 const { elkLayout } = useLayout()
 const { fitView, nodeLookup } = useVueFlow()
 

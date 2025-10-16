@@ -24,7 +24,7 @@ import { useVueFlow } from '@vue-flow/core';
 
 const { fitView, nodeLookup} = useVueFlow()
 
-const selectedFormat = ref<RdfFormat>(rdfFormats.find(f => f.type === RdfSerializationType.Turtle) ?? rdfFormats[0]);
+const selectedFormat = ref<RdfFormat>(rdfFormats.find(f => f.type === RdfSerializationType.Turtle)!);
 const rdfFormatOptions = ref<RdfFormat[]>(rdfFormats);
 const rdfText = ref<string>('');
 let rdfSimpleHash = 0;
@@ -48,9 +48,11 @@ function onQuadsChanged(rdfData: RdfData) {
   rdfText.value = rdfData.rdfText;
   dataset.value = newDataset;
 }
+
 function makeEditorSmall() {
   hideEditorSplitterPanel.value = true
 }
+
 function makeEditorBig() {
   hideEditorSplitterPanel.value = false;
 }
@@ -60,11 +62,13 @@ function toggleSearch () {
   if (showSearchPanel.value) {
     hideEditorSplitterPanel.value = true;
   } 
- 
 }
 
-function onFormatChange(rdfSerializationType: RdfSerializationType) {
+function changeEditorFormat(rdfSerializationType: RdfSerializationType) {
   const newFormat = rdfFormats.find(f => f.type === rdfSerializationType) ?? rdfFormats[0];
+  if(!newFormat) {
+    return;
+  }
   selectedFormat.value = newFormat;
 }
 
@@ -105,12 +109,11 @@ function simpleHash(str: string): number {
 
 <template>
   <Toolbar>
-    <template #start>
 
+    <template #start>
       <Button v-if="!hideEditorSplitterPanel" icon="pi pi-file-edit" class="mr-2" severity="secondary" @click="makeEditorSmall" text ></Button>
       <Button v-if="hideEditorSplitterPanel" icon="pi pi-file-edit" class="mr-2" severity="secondary" @click="makeEditorBig" text ></Button>
       <Select v-model="selectedFormat" :options="rdfFormatOptions" optionLabel="name" placeholder="Select RDF Serialization" checkmark :highlightOnSelect="false"></Select>
-
     </template>
 
     <template #center>
@@ -124,19 +127,17 @@ function simpleHash(str: string): number {
       <Button icon="pi pi-lightbulb" class="mr-2" severity="secondary" @click="showAboutDialog = !showAboutDialog" text></Button>
       <Button as="a" icon="pi pi-github" class="mr-2" severity="secondary" href="https://github.com/zazuko/rdf-sketch"
         target="_blank" text></Button>
-
-
     </template>
+
   </Toolbar>
 
   <Splitter :style="{ height: showSearchPanel ? 'calc(60vh - (67.5px + ( 2 * 8px) + 8px) )' : 'calc(100vh - (67.5px + ( 2 * 8px) + 8px) )' }" style="margin-top: 8px;" class="mb-8">
 
     <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
-      <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="onFormatChange"/>
+      <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="changeEditorFormat"/>
     </SplitterPanel>
 
     <SplitterPanel class="flex items-center justify-center">
-
       <GraphView :dataset="dataset" />
     </SplitterPanel>
 

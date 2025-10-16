@@ -21,22 +21,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, type PropType } from "vue";
 import Button from 'primevue/button';
 import Popover from 'primevue/popover';
 import type { RdfSerializationType } from "@/constant/rdf-format";
 
-interface ShareButtonPropsProps {
-  format: RdfSerializationType;
-  rdfText: string;
-}
-
-const props = defineProps<ShareButtonPropsProps>()
+const props = defineProps({
+  format: {
+    type: String as PropType<RdfSerializationType>,
+    required: true
+  },
+  rdfText: {
+    type: String,
+    required: true
+  }
+});
 
 
 const popoverElement = ref<InstanceType<typeof Popover> | null>(null);
 
-const appUrl =  new URL(window.location.href.split('#')[0]);
+const appUrl =  new URL(window.location.href.split('#')[0]!);
 
 
 const shareUrl = ref<string>('');
