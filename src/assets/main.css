@@ -24,3 +24,16 @@ body {
 a {
   text-decoration: none;
 }
+
+.p-tooltip {
+  max-width: 400px !important;
+}
+
+.p-tooltip-text {
+  overflow-wrap: anywhere !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 10 !important;
+  line-clamp: 10 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}

@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.0.9
+- Improve SPO table with long literals
+
 ## 1.0.8
 - Fix webview content not loading on first open
 
