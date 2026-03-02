@@ -53,7 +53,18 @@
           "when": "false"
         }
       ]
-    }
+    },
+    "notebookRenderer": [
+      {
+        "id": "rdf-sketch-notebook-renderer",
+        "displayName": "RDF Sketch Renderer",
+        "entrypoint": "./dist/renderer.js",
+        "mimeTypes": [
+          "text/turtle",
+          "application/n-triples"
+        ]
+      }
+    ]
   },
   "scripts": {
     "compile": "npm run check-types && node esbuild.js",
@@ -69,13 +80,14 @@
     "watch-web:esbuild": "node esbuild.web.js --watch",
     "watch-web:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "run-web": "npm run compile-vue-app && npm run compile-web && npx @vscode/test-web --extensionDevelopmentPath=. . --browser none",
-    "compile-vue-app": "cd .. && npm run build:vscode && cd src-vscode"
+    "compile-vue-app": "cd .. && npm run build:vscode && npm run build:notebook && cd src-vscode"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
     "@types/vscode": "^1.94.0",
+    "@types/vscode-notebook-renderer": "^1.72.4",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@vscode/test-cli": "^0.0.12",

@@ -89,6 +89,9 @@ watch(links, async (newLinks) => {
   nodes.value = (nodesWithLayout as any).nodes as unknown as CustomNode[];
   edges.value = (nodesWithLayout as any).edges as unknown as CustomEdge[];
 
+  setTimeout(() => {
+    fitView({ padding: 0.1, duration: 800 })
+  }, 200);
 },{ immediate: true });
 
 function onNodeDrag(nodeDragEvent: NodeDragEvent) {

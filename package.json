@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build --force",
     "lint": "eslint .",
     "build:vscode": "vite build --config vite.config.vscode.ts",
+    "build:notebook": "vite build --config vite.config.notebook.ts",
     "dev:vscode": "vite --config vite.config.vscode.ts"
   },
   "dependencies": {
@@ -43,6 +44,7 @@
     "rollup-plugin-node-polyfills": "^0.2.1",
     "typescript": "~5.9.3",
     "vite": "^7.3.0",
+    "vite-plugin-css-injected-by-js": "^4.0.1",
     "vite-plugin-pwa": "^1.2.0",
     "vue-tsc": "^3.1.8"
   }

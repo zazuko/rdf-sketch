@@ -137,8 +137,8 @@ function simpleHash(str: string): number {
       <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="changeEditorFormat"/>
     </SplitterPanel>
 
-    <SplitterPanel class="flex items-center justify-center">
-      <GraphView :dataset="dataset" />
+    <SplitterPanel style="flex-grow: 1; position: relative;">
+      <GraphView :dataset="dataset" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" />
     </SplitterPanel>
 
   </Splitter>
