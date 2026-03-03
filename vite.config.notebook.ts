@@ -35,7 +35,7 @@ export default defineConfig({
     },
     build: {
         lib: {
-            entry: fileURLToPath(new URL('./src/notebook-renderer/renderer.ts', import.meta.url)),
+            entry: fileURLToPath(new URL('./src-vscode/notebook-renderer/renderer.ts', import.meta.url)),
             name: 'rdfSketchRenderer',
             formats: ['es'],
             fileName: () => 'renderer.js'

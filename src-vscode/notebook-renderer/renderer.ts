@@ -3,11 +3,11 @@ import type { ActivationFunction } from 'vscode-notebook-renderer';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 
-import AppVscode from '../vscode-webview/AppVscode.vue';
-import { updateEventType } from '../vscode-webview/constant/update-event-type';
+import AppVscode from '../../src/vscode-webview/AppVscode.vue';
+import { updateEventType } from '../../src/vscode-webview/constant/update-event-type';
 
 // Make sure to import the CSS styles properly so they are bundled
-import '../assets/main.css';
+import '../../src/assets/main.css';
 
 
 export const activate: ActivationFunction = (context) => {
