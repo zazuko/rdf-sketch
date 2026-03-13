@@ -5,7 +5,7 @@ import { prefixMap } from '@/rdf/prefix-map';
 import GraphView from '@/components/GraphView.vue';
 
 import { ref, watch, onMounted, onUnmounted } from 'vue';
-import type { UpdateMessage } from './model/update-message';
+
 import toStream from 'string-to-stream';
 import type { Dataset, Term } from '@rdfjs/types';
 

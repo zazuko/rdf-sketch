@@ -11,7 +11,8 @@
     "build": "npm run build --workspace=@rdf-sketch/web-app",
     "build:vscode": "npm run build:vscode --workspace=@rdf-sketch/vscode-ui",
     "build:notebook": "npm run build:notebook --workspace=@rdf-sketch/vscode-ui",
-    "dev:vscode": "npm run dev:vscode --workspace=@rdf-sketch/vscode-ui"
+    "dev:vscode": "npm run dev:vscode --workspace=@rdf-sketch/vscode-ui",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",

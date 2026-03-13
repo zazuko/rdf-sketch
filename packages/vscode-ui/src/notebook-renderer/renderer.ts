@@ -4,13 +4,12 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 
 import AppVscode from '../vscode-webview/AppVscode.vue';
-import { updateEventType } from '../vscode-webview/constant/update-event-type';
 
 // Make sure to import the CSS styles properly so they are bundled
 import '@/assets/main.css';
 
 
-export const activate: ActivationFunction = (context) => {
+export const activate: ActivationFunction = (_context) => {
     return {
         renderOutputItem(data, element) {
             // Clear existing content
