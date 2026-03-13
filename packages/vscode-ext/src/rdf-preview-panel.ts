@@ -131,7 +131,7 @@ export class RdfPreviewPanel {
         });
     }
 
-    updateWebviewContent = (document: TextDocument, reason: string) => {
+    updateWebviewContent = (document: TextDocument, _reason: string) => {
         const rdfString = document.getText();
         const languageId = document.languageId;
         const fileExtension = document.fileName.split('.').pop();
@@ -156,7 +156,7 @@ export class RdfPreviewPanel {
     };
 
 
-    #getHtmlForWebview(webview: Webview, extensionUri: Uri, content: string): string {
+    #getHtmlForWebview(webview: Webview, extensionUri: Uri, _content: string): string {
         // Get resource paths
         const stylesUri = webview.asWebviewUri(Uri.joinPath(extensionUri, 'media', 'assets', 'main.css'));
         const appUri = webview.asWebviewUri(Uri.joinPath(extensionUri, 'media', 'assets', 'main.js'));
@@ -231,15 +231,15 @@ export class RdfPreviewPanel {
         }
     }
 
-    #hasColumnChanged(currentColumn: ViewColumn | undefined): Boolean {
+    #hasColumnChanged(currentColumn: ViewColumn | undefined): boolean {
         return this.#lastColumn !== currentColumn;
     }
 
-    #hasVisibilityChanged(currentState: Boolean): Boolean {
+    #hasVisibilityChanged(currentState: boolean): boolean {
         return this.#lastVisibility !== currentState;
     }
 
-    #hasActiveChanged(currentState: Boolean): Boolean {
+    #hasActiveChanged(currentState: boolean): boolean {
         return this.#lastActive !== currentState;
     }
 
