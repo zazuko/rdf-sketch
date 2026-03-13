@@ -1,4 +1,4 @@
-import './assets/main.css'
+import '@/assets/main.css'
 
 import { createApp } from 'vue';
 
@@ -8,8 +8,8 @@ import Aura from '@primeuix/themes/aura';
 import App from './App.vue';
 
 import { useUrlSearchParams } from '@vueuse/core';
-import { rdfFormats, RdfSerializationType } from './constant/rdf-format';
-import { localStorageKeyFormat, localStorageKeyText } from './constant/local-storage-keys';
+import { rdfFormats, RdfSerializationType } from '@/constant/rdf-format';
+import { localStorageKeyFormat, localStorageKeyText } from '@/constant/local-storage-keys';
 
 const params = useUrlSearchParams('hash-params')
 
