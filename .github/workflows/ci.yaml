@@ -32,10 +32,10 @@ jobs:
         run: npm run build
 
       - name: Configure CNAME
-        run: echo sketch.zazuko.com > dist/CNAME
+        run: echo sketch.zazuko.com > packages/web-app/dist/CNAME
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: dist
+          folder: packages/web-app/dist
