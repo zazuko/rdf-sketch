@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-import { rdfEnvironment } from '../rdf/environment';
-import { prefixMap } from '../rdf/prefix-map';
-import GraphView from '../components/GraphView.vue';
+import { rdfEnvironment } from '@/rdf/environment';
+import { prefixMap } from '@/rdf/prefix-map';
+import GraphView from '@/components/GraphView.vue';
 
-import { ref, watch} from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import type { UpdateMessage } from './model/update-message';
 import toStream from 'string-to-stream';
 import type { Dataset, Term } from '@rdfjs/types';
@@ -13,7 +13,7 @@ import Button from 'primevue/button';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 
-import SPOSearch from './../components/SPOSearch.vue';
+import SPOSearch from '@/components/SPOSearch.vue';
 
 import { useVueFlow } from '@vue-flow/core';
 import type { RdfPrefix } from '@/components/RdfEditor.vue';
@@ -28,15 +28,13 @@ const props = defineProps<{
 const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 const hideSearchPanel = ref(true);
 
-watch(() => props.rdfString, async (newRdfString) => {
-    if (!newRdfString || !props.contentType) return;
-    
+async function parseAndUpdate(newRdfString: string, contentType: string) {
     try {
         const rdfStream = toStream(newRdfString);
-        const quadStream = rdfEnvironment.formats.parsers.import(props.contentType, rdfStream);
+        const quadStream = rdfEnvironment.formats.parsers.import(contentType, rdfStream);
         
         if(quadStream === null) {
-            console.error('Failed to parse RDF content', { rdfString: newRdfString, contentType: props.contentType });
+            console.error('Failed to parse RDF content', { rdfString: newRdfString, contentType: contentType });
             return;
         }
 
@@ -59,7 +57,46 @@ watch(() => props.rdfString, async (newRdfString) => {
         console.error('Failed to import RDF content', error);
         return;
     }
+}
+
+watch(() => props.rdfString, async (newRdfString) => {
+    if (!newRdfString || !props.contentType) return;
+    await parseAndUpdate(newRdfString, props.contentType);
 }, { immediate: true });
+
+const handleUpdateContent = async (event: Event) => {
+    const customEvent = event as CustomEvent;
+    if (customEvent.detail && customEvent.detail.rdfString && customEvent.detail.contentType) {
+        await parseAndUpdate(customEvent.detail.rdfString, customEvent.detail.contentType);
+    }
+};
+
+let themeObserver: MutationObserver | null = null;
+
+const syncTheme = () => {
+    const isDark = document.body.classList.contains('vscode-dark');
+    if (isDark) {
+        document.documentElement.classList.add('vscode-dark');
+    } else {
+        document.documentElement.classList.remove('vscode-dark');
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('sketch.updateContent', handleUpdateContent);
+
+    // Sync PrimeVue dark mode configuration with the VS Code body class
+    syncTheme();
+    themeObserver = new MutationObserver(syncTheme);
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+});
+
+onUnmounted(() => {
+    window.removeEventListener('sketch.updateContent', handleUpdateContent);
+    if (themeObserver) {
+        themeObserver.disconnect();
+    }
+});
 
 function toggleSearch () {
   hideSearchPanel.value = !hideSearchPanel.value;

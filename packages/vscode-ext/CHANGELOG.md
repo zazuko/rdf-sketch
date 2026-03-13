@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.1.0
+- Add notebook renderer
+- Update dependencies
+
 ## 1.0.9
 - Improve SPO table with long literals
 

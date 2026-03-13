@@ -22,7 +22,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url)),
+            '@': fileURLToPath(new URL('../core-ui/src', import.meta.url)),
             stream: 'readable-stream',
             util: 'util',
         }
@@ -53,6 +53,6 @@ export default defineConfig({
                 assetFileNames: `assets/[name].[ext]`
             }
         },
-        outDir: 'src-vscode/media', // specify the target folder for the build
+        outDir: '../vscode-ext/media', // specify the target folder for the build
     },
 })

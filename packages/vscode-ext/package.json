@@ -2,7 +2,7 @@
   "name": "vscode-rdf-sketch",
   "displayName": "RDF Sketch",
   "description": "Graphical rendering of RDF data",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "license": "MIT",
   "icon": "images/zazuko.png",
   "publisher": "Zazuko",
@@ -17,7 +17,8 @@
   "keywords": [
     "RDF",
     "Turtle",
-    "Preview"
+    "Preview",
+    "Notebook Renderer"
   ],
   "repository": {
     "url": "https://github.com/zazuko/rdf-sketch"
@@ -73,14 +74,14 @@
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "vscode:prepublish": "npm run check-types && npm run compile-vue-app && node esbuild.js --production && node esbuild.web.js --production",
-    "package": "npx vsce package",
-    "publish": "npx vsce publish",
+    "package": "npx vsce package --no-dependencies",
+    "publish": "npx vsce publish --no-dependencies",
     "compile-web": "npm run check-types && node esbuild.web.js",
     "watch-web": "npm-run-all -p watch-web:*",
     "watch-web:esbuild": "node esbuild.web.js --watch",
     "watch-web:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "run-web": "npm run compile-vue-app && npm run compile-web && npx @vscode/test-web --extensionDevelopmentPath=. . --browser none",
-    "compile-vue-app": "cd .. && npm run build:vscode && npm run build:notebook && cd src-vscode"
+    "compile-vue-app": "npm run build:vscode --workspace=@rdf-sketch/vscode-ui && npm run build:notebook --workspace=@rdf-sketch/vscode-ui"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
@@ -88,12 +89,12 @@
     "@types/node": "18.x",
     "@types/vscode": "^1.94.0",
     "@types/vscode-notebook-renderer": "^1.72.4",
-    "@typescript-eslint/eslint-plugin": "^8.38.0",
-    "@typescript-eslint/parser": "^8.38.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
-    "esbuild": "^0.27.1",
-    "eslint": "^9.32.0",
+    "esbuild": "^0.27.3",
+    "eslint": "^10.0.2",
     "typescript": "^5.3.3"
   }
 }

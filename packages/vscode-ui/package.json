@@ -1,0 +1,14 @@
+{
+    "name": "@rdf-sketch/vscode-ui",
+    "version": "1.0.9",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build:vscode": "vite build --config vite.config.vscode.ts",
+        "build:notebook": "vite build --config vite.config.notebook.ts",
+        "dev:vscode": "vite --config vite.config.vscode.ts"
+    },
+    "dependencies": {
+        "@rdf-sketch/core-ui": "*"
+    }
+}

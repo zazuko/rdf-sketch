@@ -9,17 +9,17 @@ import Select from 'primevue/select';
 import Dialog from 'primevue/dialog';
 import Drawer from 'primevue/drawer';
 
-import RdfEditor from './components/RdfEditor.vue';
-import type {  RdfData } from './components/RdfEditor.vue';
-import { rdfEnvironment } from './rdf/environment';
-import { RdfSerializationType, rdfFormats} from './constant/rdf-format';
-import type { RdfFormat } from './constant/rdf-format';
-import GraphView from './components/GraphView.vue';
+import RdfEditor from '@/components/RdfEditor.vue';
+import type {  RdfData } from '@/components/RdfEditor.vue';
+import { rdfEnvironment } from '@/rdf/environment';
+import { RdfSerializationType, rdfFormats} from '@/constant/rdf-format';
+import type { RdfFormat } from '@/constant/rdf-format';
+import GraphView from '@/components/GraphView.vue';
 import type { Dataset, Term } from '@rdfjs/types';
 
-import { prefixMap } from './rdf/prefix-map'; 
-import SPOSearch from './components/SPOSearch.vue';
-import ShareButton from './components/share-button/ShareButton.vue';
+import { prefixMap } from '@/rdf/prefix-map'; 
+import SPOSearch from '@/components/SPOSearch.vue';
+import ShareButton from '@/components/share-button/ShareButton.vue';
 import { useVueFlow } from '@vue-flow/core';
 
 const { fitView, nodeLookup} = useVueFlow()

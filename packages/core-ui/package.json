@@ -1,0 +1,9 @@
+{
+    "name": "@rdf-sketch/core-ui",
+    "version": "1.0.9",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./*": "./src/*"
+    }
+}
