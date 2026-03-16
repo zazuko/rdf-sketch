@@ -49,29 +49,28 @@ function zoomToNode(term: Term) {
       
       </header>
       <div class="table-container">
-         <div v-for="(property, index) in props.data.resource.properties" :key="index" :data-id="property.id" class="table-row">
-         <div>
+        <div v-for="(property, index) in props.data.resource.properties" :key="index" :data-id="property.id" class="table-row">
+          <div>
+            <div v-for="value in property.values" :key="value.value" style="position: relative;">
+              <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0" :connectable="false"></Handle>
+            </div>
+          </div>
+          <div class="predicate">
+            {{ property.name }}
+          </div>
+
+          <div class="object">
+            <div v-for="value in property.values" :key="value.value" @click="zoomToNode(value)">
+              <RdfTerm :term="value" :env="props.data.env" :show-arrow="property.name !== 'rdf:type'" />
+            </div>
+          </div>
+
           <div v-for="value in property.values" :key="value.value" style="position: relative;">
-            <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Left" :id="`${props.data.resource.id}-${property.id}-left`" style="opacity: 0" :connectable="false"></Handle>
+            <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0;" :connectable="false"/>
           </div>
         </div>
-        <div class="predicate">
-          {{ property.name }}
-        </div>
-
-        <div class="object">
-          <div v-for="value in property.values" :key="value.value" @click="zoomToNode(value)">
-            <RdfTerm :term="value" :env="props.data.env" />
-          </div>
-        </div>
-
-        <div v-for="value in property.values" :key="value.value" style="position: relative;">
-          <Handle v-if="value.termType === 'NamedNode' || value.termType === 'BlankNode'" type="source" :position="Position.Right" :id="`${props.data.resource.id}-${property.id}-right`" style="opacity: 0;" :connectable="false"/>
-        </div>
-          
       </div>
-  </div>
-</div>
+    </div>
   </div>
 </template>
 
@@ -105,32 +104,24 @@ function zoomToNode(term: Term) {
   flex-direction: column;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: grey;
-}
-
-tr {
-  position: relative;
-}
-tr:not(:last-child) {
-  border-bottom: 1px solid lightgray !important;
-}
 
 .table-container {
   display: table;
   width: 100%;
+  border-collapse: collapse;
 }
 
 .table-row {
   display: table-row;
   position: relative !important;
-  border-bottom: 1px solid gray;
+  border-bottom: 1px solid lightgray;
   right: 0;
   top: 0;
 }
 
+.table-row:last-child {
+  border-bottom: none;
+}
 .predicate, .object {
   display: table-cell;
   padding: 8px;
