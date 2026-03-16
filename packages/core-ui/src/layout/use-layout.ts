@@ -16,26 +16,30 @@ export function useLayout() {
         const options = {
             "algorithm": "mrtree",                                       // MRTREE algorithm for tree layout
             "org.eclipse.elk.direction": "RIGHT",                         // Layout direction (can be UP, DOWN, LEFT, RIGHT)
-            "org.eclipse.elk.spacing.nodeNode": "400",                    // Space between nodes
+            "org.eclipse.elk.spacing.nodeNode": "800",                    // Space between nodes vertically (siblings)
+            "org.eclipse.elk.spacing.componentComponent": "400",          // Space between disconnected tree components
+            "org.eclipse.elk.spacing.portPort": "60",                     // Space between edge attachment points
             "org.eclipse.elk.spacing.edgeEdge": "20",                    // Space between edges
             "org.eclipse.elk.spacing.edgeNode": "30",                    // Space between nodes and edges
-            "org.eclipse.elk.mrtree.spacing.level": "500",                // Space between levels in the tree
+            "org.eclipse.elk.mrtree.spacing.level": "1000",               // Space between levels horizontally (parent to child)
             "org.eclipse.elk.mrtree.compaction.strategy": "DOWN",        // Compaction strategy
             "org.eclipse.elk.mrtree.nodePlacement.strategy": "SIMPLE",   // Simple node placement strategy
             "org.eclipse.elk.mrtree.nodePlacement.bk.fixedAlignment": "BALANCED", // Balanced alignment for nodes
         };
 
         const elkNodes: any[] = nodes.map((node) => {
+            const elkW = node.dimensions?.width || 1000;
+            const elkH = node.dimensions?.height || (headerHeight + rowHeight * node.data.resource.properties.length);
             return {
                 id: node.id,
-                width: 1000,
-                height: headerHeight + rowHeight * node.data.resource.properties.length,
+                width: elkW,
+                height: elkH,
                 labels: [{ text: node.data.resource.name }],
-                properties: node.data.resource.properties.map((property) => {
+                properties: node.data.resource.properties.map((property: any) => {
                     return {
                         id: property.id,
-                        width: 1000,
-                        height: rowHeight,
+                        width: elkW,
+                        height: rowHeight, // we can probably leave this as is since properties might not individually need exact height for mrtree
                         labels: [{ text: property.name }],
                     }
                 }),
