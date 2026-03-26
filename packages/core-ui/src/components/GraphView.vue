@@ -111,6 +111,16 @@ async function onNodesInitialized() {
     }));
     edges.value = (nodesWithLayout as any).edges as CustomEdge[];
 
+    // Update edge handles based on computed positions
+    edges.value.forEach(e => {
+      const sourceNode = nodes.value.find(n => n.id === e.source);
+      const targetNode = nodes.value.find(n => n.id === e.target);
+      if (sourceNode && targetNode) {
+        const isTargetLeft = targetNode.position.x < sourceNode.position.x;
+        e.sourceHandle = `${sourceNode.id}-${e.data?.sourceProperty}-${isTargetLeft ? 'left' : 'right'}`;
+      }
+    });
+
     setTimeout(() => {
       fitView({ padding: 0.1, duration: 800 })
     }, 200);

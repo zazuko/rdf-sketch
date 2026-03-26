@@ -11,20 +11,25 @@ const rowHeight = 52;
  */
 export function useLayout() {
 
-    async function elkLayout(nodes: Node[], edges: Edge[]) {
+    async function elkLayout(nodes: any[], edges: any[]) {
 
         const options = {
-            "algorithm": "mrtree",                                       // MRTREE algorithm for tree layout
-            "org.eclipse.elk.direction": "RIGHT",                         // Layout direction (can be UP, DOWN, LEFT, RIGHT)
-            "org.eclipse.elk.spacing.nodeNode": "800",                    // Space between nodes vertically (siblings)
-            "org.eclipse.elk.spacing.componentComponent": "400",          // Space between disconnected tree components
-            "org.eclipse.elk.spacing.portPort": "60",                     // Space between edge attachment points
-            "org.eclipse.elk.spacing.edgeEdge": "20",                    // Space between edges
-            "org.eclipse.elk.spacing.edgeNode": "30",                    // Space between nodes and edges
-            "org.eclipse.elk.mrtree.spacing.level": "1000",               // Space between levels horizontally (parent to child)
-            "org.eclipse.elk.mrtree.compaction.strategy": "DOWN",        // Compaction strategy
-            "org.eclipse.elk.mrtree.nodePlacement.strategy": "SIMPLE",   // Simple node placement strategy
-            "org.eclipse.elk.mrtree.nodePlacement.bk.fixedAlignment": "BALANCED", // Balanced alignment for nodes
+            "algorithm": "layered",                                      // Best for directed graphs (RDF)
+            "org.eclipse.elk.direction": "RIGHT",                        // Subject on left -> Object on right
+            
+            // Layering strategies
+            "org.eclipse.elk.layered.layering.strategy": "NETWORK_SIMPLEX", // Groups nodes efficiently
+            "org.eclipse.elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
+            
+            // Edge routing
+            "org.eclipse.elk.edgeRouting": "ORTHOGONAL",                 // Use clean right-angle lines
+            "org.eclipse.elk.layered.crossingMinimization.strategy": "LAYER_SWEEP", // Actively prevents tangled lines
+            
+            // Spacing
+            "org.eclipse.elk.spacing.nodeNode": "900",                   // Vertical space between nodes in the same layer
+            "org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers": "1200", // Horizontal space between layers
+            "org.eclipse.elk.spacing.edgeNode": "150",                   // Space between edges and nodes
+            "org.eclipse.elk.spacing.edgeEdge": "75",                   // Space between parallel edges
         };
 
         const elkNodes: any[] = nodes.map((node) => {
@@ -35,12 +40,17 @@ export function useLayout() {
                 width: elkW,
                 height: elkH,
                 labels: [{ text: node.data.resource.name }],
-                properties: node.data.resource.properties.map((property: any) => {
+                // Map properties to ELK Ports so the routing algorithm knows the exact vertical origin
+                ports: node.data.resource.properties.map((property: any, index: number) => {
                     return {
-                        id: property.id,
-                        width: elkW,
-                        height: rowHeight, // we can probably leave this as is since properties might not individually need exact height for mrtree
-                        labels: [{ text: property.name }],
+                        id: `${node.id}-${property.id}`, // Unique port ID per node
+                        width: 1,
+                        height: 1,
+                        // Tell ELK this port is roughly at this vertical offset on the right side
+                        properties: {
+                            "org.eclipse.elk.port.side": "EAST",
+                            "org.eclipse.elk.port.index": index,
+                        }
                     }
                 }),
             }
@@ -48,9 +58,11 @@ export function useLayout() {
 
         const elkEdges = edges.map((edge) => {
             return {
-                id: `${edge.source}-${edge.target}`,
+                id: edge.id, // e.g. "source-prop-target"
                 sources: [edge.source],
                 targets: [edge.target],
+                // Tell elk exactly which port (property) on the source node this edge comes from
+                sourcePort: `${edge.source}-${edge.data?.sourceProperty}` 
             }
         });
 
