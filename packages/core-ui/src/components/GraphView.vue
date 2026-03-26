@@ -69,9 +69,11 @@ const links = computed(() => {
 const nodes = ref<CustomNode[]>([])
 const edges = ref<CustomEdge[]>([])
 const isLoading = ref<boolean>(true)
+let hasLaidOut = false;
 
 watch(links, (newLinks) => {
   isLoading.value = true;
+  hasLaidOut = false; // allow layout to run again for new data
   nodes.value = resources.value.map(resource => ({
     id: resource.id,
     type: 'custom',
@@ -93,6 +95,11 @@ watch(links, (newLinks) => {
 },{ immediate: true });
 
 async function onNodesInitialized() {
+  // Guard: after the first layout, updating nodes.value causes Vue Flow to re-fire
+  // this event. We only want to run the expensive ELK layout once per data change.
+  if (hasLaidOut) return;
+  hasLaidOut = true;
+
   // Wait a moment for Vue Flow to fully apply CSS and typography rendering to DOM 
   // so that node.dimensions gets accurately populated by the internal ResizeObserver.
   setTimeout(async () => {
@@ -116,16 +123,6 @@ async function onNodesInitialized() {
       style: { opacity: 1 } // Show nodes once layout is applied
     }));
     edges.value = (nodesWithLayout as any).edges as CustomEdge[];
-
-    // Update edge handles based on computed positions
-    edges.value.forEach(e => {
-      const sourceNode = nodes.value.find(n => n.id === e.source);
-      const targetNode = nodes.value.find(n => n.id === e.target);
-      if (sourceNode && targetNode) {
-        const isTargetLeft = targetNode.position.x < sourceNode.position.x;
-        e.sourceHandle = `${sourceNode.id}-${e.data?.sourceProperty}-${isTargetLeft ? 'left' : 'right'}`;
-      }
-    });
 
     setTimeout(() => {
       fitView({ padding: 0.1, duration: 800 })
@@ -253,9 +250,7 @@ function onNodeDrag(nodeDragEvent: NodeDragEvent) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--vscode-editor-background, rgba(255, 255, 255, 0.7));
   z-index: 1000;
-  backdrop-filter: blur(2px);
 }
 
 .loader {

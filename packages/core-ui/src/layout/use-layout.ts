@@ -1,6 +1,5 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
 
-import { type Node, type Edge } from '@vue-flow/core'
 
 const headerHeight = 76;
 const rowHeight = 52;
@@ -16,15 +15,15 @@ export function useLayout() {
         const options = {
             "algorithm": "layered",                                      // Best for directed graphs (RDF)
             "org.eclipse.elk.direction": "RIGHT",                        // Subject on left -> Object on right
-            
+
             // Layering strategies
             "org.eclipse.elk.layered.layering.strategy": "NETWORK_SIMPLEX", // Groups nodes efficiently
             "org.eclipse.elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
-            
+
             // Edge routing
             "org.eclipse.elk.edgeRouting": "ORTHOGONAL",                 // Use clean right-angle lines
             "org.eclipse.elk.layered.crossingMinimization.strategy": "LAYER_SWEEP", // Actively prevents tangled lines
-            
+
             // Spacing
             "org.eclipse.elk.spacing.nodeNode": "900",                   // Vertical space between nodes in the same layer
             "org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers": "1200", // Horizontal space between layers
@@ -62,7 +61,7 @@ export function useLayout() {
                 sources: [edge.source],
                 targets: [edge.target],
                 // Tell elk exactly which port (property) on the source node this edge comes from
-                sourcePort: `${edge.source}-${edge.data?.sourceProperty}` 
+                sourcePort: `${edge.source}-${edge.data?.sourceProperty}`
             }
         });
 
@@ -86,36 +85,22 @@ export function useLayout() {
                     return node;
                 });
 
-                for (const edge of edges) {
+                const updatedEdges = edges.map((edge) => {
                     const sourceNode = nodesWithPosition.find((node) => node.id === edge.source)
                     const targetNode = nodesWithPosition.find((node) => node.id === edge.target)
 
-                    if (sourceNode.position.x < targetNode.position.x) {
-                        const handlePosition = `right`;
-                        const currentSourceHandle = edge.sourceHandle;
-                        if (!currentSourceHandle.endsWith(handlePosition)) {
-                            // remove the word right from the end of the string 
-                            edge.sourceHandle = currentSourceHandle.slice(0, -5)
-                            edge.sourceHandle = `${edge.sourceHandle}${handlePosition}`
+                    // Determine side based on relative positions after layout
+                    const side = sourceNode.position.x < targetNode.position.x ? 'right' : 'left';
 
-                        }
-                    } else {
-                        const handlePosition = `left`;
-                        const currentSourceHandle = edge.sourceHandle;
-                        if (!currentSourceHandle.endsWith(handlePosition)) {
-                            // remove the word left from the end of the string 
-                            edge.sourceHandle = currentSourceHandle.slice(0, -5)
-                            edge.sourceHandle = `${edge.sourceHandle}${handlePosition}`
-
-                        }
-                    }
-
-
-
-                }
+                    // Return a new edge object so Vue's reactivity always detects the change
+                    return {
+                        ...edge,
+                        sourceHandle: `${sourceNode.id}-${edge.data?.sourceProperty}-${side}`
+                    };
+                });
                 return {
                     nodes: nodesWithPosition,
-                    edges: edges,
+                    edges: updatedEdges,
                 }
             })
             .catch(console.error);
