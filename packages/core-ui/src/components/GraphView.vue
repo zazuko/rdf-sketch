@@ -1,5 +1,9 @@
 <template>
-    <div style="height: 100%; width:100%">
+    <div style="height: 100%; width:100%; position: relative;">
+      <div v-if="isLoading" class="loading-overlay">
+        <div class="loader"></div>
+        <div style="margin-top: 1rem; font-family: sans-serif;">Rendering graph layout...</div>
+      </div>
     <VueFlow 
     :nodes="nodes" 
     :edges="edges" 
@@ -64,8 +68,10 @@ const links = computed(() => {
 
 const nodes = ref<CustomNode[]>([])
 const edges = ref<CustomEdge[]>([])
+const isLoading = ref<boolean>(true)
 
 watch(links, (newLinks) => {
+  isLoading.value = true;
   nodes.value = resources.value.map(resource => ({
     id: resource.id,
     type: 'custom',
@@ -123,6 +129,9 @@ async function onNodesInitialized() {
 
     setTimeout(() => {
       fitView({ padding: 0.1, duration: 800 })
+      setTimeout(() => {
+        isLoading.value = false;
+      }, 800);
     }, 200);
   }, 50);
 }
@@ -232,6 +241,35 @@ function onNodeDrag(nodeDragEvent: NodeDragEvent) {
   margin-left: auto;
   margin-right: 0;
   color: #8a9ba1;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--vscode-editor-background, rgba(255, 255, 255, 0.7));
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.loader {
+  border: 4px solid var(--vscode-dropdown-border, #f3f3f3);
+  border-top: 4px solid var(--vscode-button-background, #3498db);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 </style>
