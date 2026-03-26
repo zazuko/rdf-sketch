@@ -7,8 +7,10 @@ v-if="spo"
  :value="spo" 
  :itemSize="itemSizeWithPadding" 
  scrollable 
- :scrollHeight="props.isVscode ? 'calc(40vh - 0px)' : 'calc(40vh - 42px)'" :virtualScrollerOptions="{ itemSize: itemSizeWithPadding }" 
+ scrollHeight="flex" 
+ :virtualScrollerOptions="{ itemSize: itemSizeWithPadding }" 
  class="spo-table"
+ style="height: 100%; display: flex; flex-direction: column;"
  tableStyle="table-layout: fixed">
     <Column field="subject" header="Subject"  :style="{ width: hasContext ? '25%' : '33.33%' }">  
         <template #filter="{ filterModel, filterCallback }">
@@ -155,6 +157,11 @@ span {
 
 .node-link {
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+.node-link:hover {
+    color: var(--p-primary-color, #007acc);
     text-decoration: underline;
 }
 

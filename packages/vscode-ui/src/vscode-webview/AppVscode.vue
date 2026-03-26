@@ -123,26 +123,16 @@ function onNdeSelected(term: Term) {
     <svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true" class="DocSearch-Search-Icon"><path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg>
   </Button>
 
-  <Splitter :unstyled="true" style="height: 100vh; width: 100vw; flex-direction: column; display: flex; flex-wrap: nowrap;" layout="vertical" >
-    <SplitterPanel style="flex-grow: 1; height: 100%; width: 100%; position: relative;">
+  <Splitter style="height: 100vh; width: 100vw; flex-direction: column; display: flex; flex-wrap: nowrap;" layout="vertical" >
+    <SplitterPanel :size="60" style="flex-grow: 1; height: 100%; width: 100%; position: relative;">
         <GraphView :dataset="dataset" style="height: 100%; width: 100%; position: absolute; top: 0; left: 0;" />
-
-      <!-- 
-        <div 
-          class="graph-panel"
-          :class="{'full-height': hideSearchPanel}" 
-        >
-            <GraphView :dataset="dataset"/>
-        </div>  
-        -->
      </SplitterPanel>
 
-    <SplitterPanel  v-if="!hideSearchPanel" style="display: flex; flex-direction: column; flex-grow: 1; width: 100%; overflow: hidden;">
+    <SplitterPanel v-if="!hideSearchPanel" :size="40" style="display: flex; flex-direction: column; flex-grow: 1; width: 100%; overflow: hidden;">
         <div class="search" style="width: 100%; height: 100%;">
-            <SPOSearch :dataset="dataset" :is-vscode="true" @selected="onNdeSelected" style="width: 100%;" />
+            <SPOSearch :dataset="dataset" :is-vscode="true" @selected="onNdeSelected" style="width: 100%; height: 100%;" />
         </div>
     </SplitterPanel>
-
   </Splitter>
 
 </template>
@@ -151,9 +141,8 @@ function onNdeSelected(term: Term) {
 <style>
 .search {
   background-color: white;
-  max-height: 40vh; 
-  height: 40vh;
   width: 100%;
+  height: 100%;
   border-top: solid 1px var(--p-datatable-header-cell-border-color);
 }
 
