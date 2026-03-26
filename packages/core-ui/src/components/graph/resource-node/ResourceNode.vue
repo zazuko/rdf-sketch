@@ -84,8 +84,8 @@ function zoomToNode(term: Term) {
   background-color: white;
   box-shadow: 0 4px 6px rgba(107, 107, 107, 0.8);
   min-width: 500px;
-
-  
+  width: max-content;
+  max-width: max-content;
 }
 
 .resource-card-header {

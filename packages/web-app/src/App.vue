@@ -131,35 +131,31 @@ function simpleHash(str: string): number {
 
   </Toolbar>
 
-  <Splitter :style="{ height: showSearchPanel ? 'calc(60vh - (67.5px + ( 2 * 8px) + 8px) )' : 'calc(100vh - (67.5px + ( 2 * 8px) + 8px) )' }" style="margin-top: 8px;" class="mb-8">
+  <Splitter layout="vertical" :style="{ height: 'calc(100vh - (67.5px + ( 2 * 8px) + 8px) )' }" style="margin-top: 8px;" class="mb-8">
+    <SplitterPanel :size="60" style="display: flex; flex-direction: column;">
+      <Splitter style="height: 100%; width: 100%;">
+        <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
+          <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="changeEditorFormat"/>
+        </SplitterPanel>
 
-    <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
-      <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="changeEditorFormat"/>
+        <SplitterPanel style="flex-grow: 1; position: relative;">
+          <GraphView :dataset="dataset" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" />
+        </SplitterPanel>
+      </Splitter>
     </SplitterPanel>
 
-    <SplitterPanel style="flex-grow: 1; position: relative;">
-      <GraphView :dataset="dataset" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" />
+    <SplitterPanel v-if="showSearchPanel" :size="40" style="display: flex; flex-direction: column; overflow: hidden; background-color: var(--p-content-background);">
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--p-datatable-header-cell-border-color); font-size: 16px; font-weight: 600; background: var(--p-content-background);">
+        SPO Search
+      </div>
+      <div style="flex-grow: 1; height: 100%; overflow: auto;">
+        <SPOSearch :dataset="dataset" :is-vscode="false" @selected="onNdeSelected"/>
+      </div>
     </SplitterPanel>
-
   </Splitter>
 
 
-  <Drawer v-model:visible="showSearchPanel" header="SPO Search" :modal="false" position="bottom" :dismissable="false" style="height: 40vh" :pt="{
-        root: {
-            style: 'padding: 0;'
-        },
-        content: {
-            style: 'padding: 0;'
-        },
-        title: {
-          style: 'font-size: 16px; font-weight: 600;'
-        },
-        header: {
-            style: 'padding-left: 16px; padding-top:0; padding-bottom:0; padding-right: 0px; '
-            
-        }}">
-    <SPOSearch :dataset="dataset" :is-vscode="false" @selected="onNdeSelected"/>
-  </Drawer>
+
 
   <Dialog v-model:visible="showAboutDialog" header="Zazuko RDF Sketch" :style="{ width: '60rem' }">
     <div style="display: flex; flex-direction: row; gap: 24px">  

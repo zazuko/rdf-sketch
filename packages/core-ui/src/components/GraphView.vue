@@ -1,11 +1,16 @@
 <template>
-    <div style="height: 100%; width:100%">
+    <div style="height: 100%; width:100%; position: relative;">
+      <div v-if="isLoading" class="loading-overlay">
+        <div class="loader"></div>
+        <div style="margin-top: 1rem; font-family: sans-serif;">Rendering graph layout...</div>
+      </div>
     <VueFlow 
     :nodes="nodes" 
     :edges="edges" 
     :min-zoom="0.00005" 
     :max-zoom="10"
     :fit-view-on-init="true"
+    @nodes-initialized="onNodesInitialized"
     @node-drag="onNodeDrag"
     @edge-click="zoomToNode" 
     >
@@ -63,18 +68,19 @@ const links = computed(() => {
 
 const nodes = ref<CustomNode[]>([])
 const edges = ref<CustomEdge[]>([])
+const isLoading = ref<boolean>(true)
 
-watch(links, async (newLinks) => {
-  const nodesWithoutLayout = resources.value.map(resource => ({
+watch(links, (newLinks) => {
+  isLoading.value = true;
+  nodes.value = resources.value.map(resource => ({
     id: resource.id,
     type: 'custom',
     position: { x: 0, y: 0 },
-    data: {
-      resource
-    },
-  }));
+    data: { resource },
+    style: { opacity: 0 } // Hide nodes until layout is calculated
+  })) as CustomNode[];
 
-  const newEdges = newLinks.map(link => ({
+  edges.value = newLinks.map(link => ({
     id: `${link.source}-${link.sourceProperty}-${link.target}`,
     source: link.source,
     target: link.target,
@@ -82,17 +88,53 @@ watch(links, async (newLinks) => {
     animated: false,
     data: link,
     type: 'custom',
-    markerEnd:  MarkerType.ArrowClosed
-  }));
-
-  const nodesWithLayout = await elkLayout(nodesWithoutLayout, newEdges);
-  nodes.value = (nodesWithLayout as any).nodes as unknown as CustomNode[];
-  edges.value = (nodesWithLayout as any).edges as unknown as CustomEdge[];
-
-  setTimeout(() => {
-    fitView({ padding: 0.1, duration: 800 })
-  }, 200);
+    markerEnd: MarkerType.ArrowClosed
+  })) as CustomEdge[];
 },{ immediate: true });
+
+async function onNodesInitialized() {
+  // Wait a moment for Vue Flow to fully apply CSS and typography rendering to DOM 
+  // so that node.dimensions gets accurately populated by the internal ResizeObserver.
+  setTimeout(async () => {
+    // Vue Flow stores actual DOM dimensions in its internal nodeLookup state!
+    // We must merge these dimensions into our node array before layout.
+    const nodesWithDimensions = nodes.value.map(n => {
+      const internalNode = nodeLookup.value.get(n.id)
+      return {
+        ...n,
+        dimensions: {
+          width: internalNode?.dimensions?.width || 500,
+          height: internalNode?.dimensions?.height || 200
+        }
+      }
+    });
+
+    const nodesWithLayout = await elkLayout(nodesWithDimensions, edges.value);
+    
+    nodes.value = (nodesWithLayout as any).nodes.map((n: CustomNode) => ({
+      ...n,
+      style: { opacity: 1 } // Show nodes once layout is applied
+    }));
+    edges.value = (nodesWithLayout as any).edges as CustomEdge[];
+
+    // Update edge handles based on computed positions
+    edges.value.forEach(e => {
+      const sourceNode = nodes.value.find(n => n.id === e.source);
+      const targetNode = nodes.value.find(n => n.id === e.target);
+      if (sourceNode && targetNode) {
+        const isTargetLeft = targetNode.position.x < sourceNode.position.x;
+        e.sourceHandle = `${sourceNode.id}-${e.data?.sourceProperty}-${isTargetLeft ? 'left' : 'right'}`;
+      }
+    });
+
+    setTimeout(() => {
+      fitView({ padding: 0.1, duration: 800 })
+      setTimeout(() => {
+        isLoading.value = false;
+      }, 800);
+    }, 200);
+  }, 50);
+}
 
 function onNodeDrag(nodeDragEvent: NodeDragEvent) {
   const focusNode = nodeDragEvent.node;
@@ -199,6 +241,35 @@ function onNodeDrag(nodeDragEvent: NodeDragEvent) {
   margin-left: auto;
   margin-right: 0;
   color: #8a9ba1;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--vscode-editor-background, rgba(255, 255, 255, 0.7));
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.loader {
+  border: 4px solid var(--vscode-dropdown-border, #f3f3f3);
+  border-top: 4px solid var(--vscode-button-background, #3498db);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 </style>

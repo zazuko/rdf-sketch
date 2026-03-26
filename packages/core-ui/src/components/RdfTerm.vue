@@ -86,16 +86,15 @@ function avoidNodeDrag(event: MouseEvent) {
 }
 .named-node:hover .node-text {
   text-decoration: underline;
-  color: blue;
+  color: var(--p-primary-color, #007acc);
 }
-
 
 .blank-node:hover .arrow {
   opacity: 1;
 }
 .blank-node:hover .node-text {
   text-decoration: underline;
-  color: blue;
+  color: var(--p-primary-color, #007acc);
 }
 
 .data-type {
