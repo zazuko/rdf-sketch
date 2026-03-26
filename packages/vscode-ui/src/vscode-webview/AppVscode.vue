@@ -124,11 +124,11 @@ function onNdeSelected(term: Term) {
   </Button>
 
   <Splitter style="height: 100vh; width: 100vw; flex-direction: column; display: flex; flex-wrap: nowrap;" layout="vertical" >
-    <SplitterPanel :size="60" style="flex-grow: 1; height: 100%; width: 100%; position: relative;">
+    <SplitterPanel :size="50" style="flex-grow: 1; height: 100%; width: 100%; position: relative;">
         <GraphView :dataset="dataset" style="height: 100%; width: 100%; position: absolute; top: 0; left: 0;" />
      </SplitterPanel>
 
-    <SplitterPanel v-if="!hideSearchPanel" :size="40" style="display: flex; flex-direction: column; flex-grow: 1; width: 100%; overflow: hidden;">
+    <SplitterPanel v-if="!hideSearchPanel" :size="50" style="display: flex; flex-direction: column; flex-grow: 1; width: 100%; overflow: hidden;">
         <div class="search" style="width: 100%; height: 100%;">
             <SPOSearch :dataset="dataset" :is-vscode="true" @selected="onNdeSelected" style="width: 100%; height: 100%;" />
         </div>

@@ -7,7 +7,6 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Select from 'primevue/select';
 import Dialog from 'primevue/dialog';
-import Drawer from 'primevue/drawer';
 
 import RdfEditor from '@/components/RdfEditor.vue';
 import type {  RdfData } from '@/components/RdfEditor.vue';
@@ -34,6 +33,27 @@ const dataset  = ref<Dataset>(rdfEnvironment.dataset() as unknown as Dataset);
 const hideEditorSplitterPanel = ref(false);
 const showSearchPanel = ref(false);
 const showAboutDialog = ref(false);
+const searchPanelHeight = ref(350); // px, draggable
+
+function onResizeDragStart(e: MouseEvent) {
+  e.preventDefault();
+  const startY = e.clientY;
+  const startHeight = searchPanelHeight.value;
+
+  function onMouseMove(ev: MouseEvent) {
+    // Dragging up increases the search panel
+    const delta = startY - ev.clientY;
+    searchPanelHeight.value = Math.max(80, Math.min(window.innerHeight - 150, startHeight + delta));
+  }
+
+  function onMouseUp() {
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('mouseup', onMouseUp);
+  }
+
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+}
 
 function onQuadsChanged(rdfData: RdfData) {
   const hash = simpleHash(rdfData.rdfText);
@@ -61,7 +81,7 @@ function toggleSearch () {
   showSearchPanel.value = !showSearchPanel.value;
   if (showSearchPanel.value) {
     hideEditorSplitterPanel.value = true;
-  } 
+  }
 }
 
 function changeEditorFormat(rdfSerializationType: RdfSerializationType) {
@@ -131,8 +151,10 @@ function simpleHash(str: string): number {
 
   </Toolbar>
 
-  <Splitter layout="vertical" :style="{ height: 'calc(100vh - (67.5px + ( 2 * 8px) + 8px) )' }" style="margin-top: 8px;" class="mb-8">
-    <SplitterPanel :size="60" style="display: flex; flex-direction: column;">
+  <div style="display: flex; flex-direction: column; height: calc(100vh - 91.5px); margin-top: 8px;">
+
+    <!-- Graph + Editor: takes all remaining space, shrinks when search opens -->
+    <div style="flex: 1 1 0; min-height: 0;">
       <Splitter style="height: 100%; width: 100%;">
         <SplitterPanel :style="{ display: hideEditorSplitterPanel ? 'none' : 'flex' }" class="flex items-center justify-center">
           <RdfEditor :format="currentSerialization" @change="onQuadsChanged" @format-change="changeEditorFormat"/>
@@ -142,17 +164,31 @@ function simpleHash(str: string): number {
           <GraphView :dataset="dataset" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" />
         </SplitterPanel>
       </Splitter>
-    </SplitterPanel>
+    </div>
 
-    <SplitterPanel v-if="showSearchPanel" :size="40" style="display: flex; flex-direction: column; overflow: hidden; background-color: var(--p-content-background);">
-      <div style="padding: 12px 16px; border-bottom: 1px solid var(--p-datatable-header-cell-border-color); font-size: 16px; font-weight: 600; background: var(--p-content-background);">
-        SPO Search
+    <!-- Drag handle + SPO Search panel -->
+    <template v-if="showSearchPanel">
+      <!-- Resize handle -->
+      <div
+        @mousedown="onResizeDragStart"
+        style="flex: 0 0 5px; cursor: row-resize; background: var(--p-datatable-header-cell-border-color); transition: background 0.15s;"
+        @mouseenter="(e) => (e.target as HTMLElement).style.background = 'var(--p-primary-color)'"
+        @mouseleave="(e) => (e.target as HTMLElement).style.background = 'var(--p-datatable-header-cell-border-color)'"
+      />
+
+      <!-- SPO Search panel: pixel height, draggable -->
+      <div :style="{ flex: '0 0 ' + searchPanelHeight + 'px' }" style="min-height: 0; display: flex; flex-direction: column; overflow: hidden; background-color: var(--p-content-background);">
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--p-datatable-header-cell-border-color); font-size: 16px; font-weight: 600; background: var(--p-content-background);">
+          SPO Search
+        </div>
+        <div style="flex-grow: 1; min-height: 0; overflow: auto;">
+          <SPOSearch :dataset="dataset" :is-vscode="false" @selected="onNdeSelected"/>
+        </div>
       </div>
-      <div style="flex-grow: 1; height: 100%; overflow: auto;">
-        <SPOSearch :dataset="dataset" :is-vscode="false" @selected="onNdeSelected"/>
-      </div>
-    </SplitterPanel>
-  </Splitter>
+    </template>
+
+  </div>
+
 
 
 
