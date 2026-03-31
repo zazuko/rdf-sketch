@@ -127,12 +127,10 @@ async function onNodesInitialized() {
       style: { opacity: 1 } // Show nodes once layout is applied
     }));
     edges.value = (nodesWithLayout as any).edges as CustomEdge[];
+  isLoading.value = false;
 
     setTimeout(() => {
       fitView({ padding: 0.1, duration: 800 })
-      setTimeout(() => {
-        isLoading.value = false;
-      }, 800);
     }, 200);
   }, 50);
 }
