@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.1.3
+- Fix no visualisation if no links
+
 ## 1.1.2
 - Fix spinner bug: The spinner did not disappear if the dataset was empty
 
