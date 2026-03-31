@@ -72,7 +72,11 @@ const isLoading = ref<boolean>(true)
 let hasLaidOut = false;
 
 watch(links, (newLinks) => {
-  isLoading.value = true;
+  if (newLinks.length === 0) {
+    isLoading.value = false;
+  } else {
+    isLoading.value = true;
+  }
   hasLaidOut = false; // allow layout to run again for new data
   nodes.value = resources.value.map(resource => ({
     id: resource.id,
