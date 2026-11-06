@@ -1,0 +1,1 @@
+import{n as e}from"./main-YdbDDh46.js";var t=class extends e{constructor({...e}={}){super({encoding:`string`,...e})}};export{t as default};

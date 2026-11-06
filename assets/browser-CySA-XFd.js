@@ -1,0 +1,1 @@
+import{t as e}from"./rolldown-runtime-sJBDdmOt.js";var t=e(((e,t)=>{var{AbortController:n,AbortSignal:r}=typeof self<`u`?self:typeof window<`u`?window:void 0;t.exports=n,t.exports.AbortSignal=r,t.exports.default=n}));export{t};

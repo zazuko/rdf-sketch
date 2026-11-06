@@ -1,0 +1,1 @@
+import{t as e}from"./main-YdbDDh46.js";var t=e(),n=class extends t.RdfXmlParser{constructor({factory:e,...t}={}){super({...t,dataFactory:e})}};export{n as default};
