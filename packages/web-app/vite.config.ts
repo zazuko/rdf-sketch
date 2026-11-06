@@ -4,11 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
-import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill'
-
 import rollupNodePolyFill from 'rollup-plugin-node-polyfills'
-import inject from '@rollup/plugin-inject';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -37,30 +33,35 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('../core-ui/src', import.meta.url)),
+            'node:stream': 'readable-stream',
             stream: 'readable-stream',
             util: 'util',
         }
     },
     optimizeDeps: {
-        esbuildOptions: {
+        rolldownOptions: {
             plugins: [
-                NodeGlobalsPolyfillPlugin({
-                    process: true,
-                    buffer: true,
-                }) as any,
-                NodeModulesPolyfillPlugin()
+                rollupNodePolyFill() as any,
             ],
+            transform: {
+                inject: {
+                    process: 'process',
+                    Buffer: ['buffer', 'Buffer'],
+                },
+            },
         },
     },
     build: {
-        rollupOptions: {
+        rolldownOptions: {
             plugins: [
                 rollupNodePolyFill() as any,
-                inject({
+            ],
+            transform: {
+                inject: {
                     process: 'process', // Inject process global
                     Buffer: ['buffer', 'Buffer'], // Inject Buffer global
-                }),
-            ],
+                },
+            },
             input: {
                 main: fileURLToPath(new URL('./index.html', import.meta.url))
             }

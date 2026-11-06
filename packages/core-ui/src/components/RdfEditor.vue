@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, type PropType, type VNodeRef } from 'vue';
+import { onMounted, ref, watch, type PropType, type VNodeRef } from 'vue';
 
 import '@rdfjs-elements/rdf-editor';
 
@@ -39,6 +39,24 @@ const prefixList = ref<RdfPrefix[]>([]);
 const editorElement = ref<VNodeRef |null>(null);
 const currentSerialization = ref<RdfSerializationType>(RdfSerializationType.Turtle);
 
+const prefixes = "rdf,rdfs,sh";
+const builtinPrefixes = new Set(prefixes.split(','));
+// Mutate in-place so <rdf-editor> does not see a new object reference after every parse
+// and trigger an unwanted re-serialize -> re-parse cycle.
+const customPrefixes: Record<string, string> = {};
+
+function syncCustomPrefixes() {
+  for (const key of Object.keys(customPrefixes)) {
+    delete customPrefixes[key];
+  }
+  for (const p of prefixList.value) {
+    const uri = typeof p.uri === 'string' ? p.uri : (p.uri as unknown as any)?.value;
+    if (uri && !builtinPrefixes.has(p.prefix)) {
+      customPrefixes[p.prefix] = uri;
+    }
+  }
+}
+
 watch(() => props.format, (newFormat) => {
   if (newFormat !== currentSerialization.value) {
     currentSerialization.value = newFormat;
@@ -53,49 +71,42 @@ function onParsingFailed(e: CustomEvent) {
 }
 
 function onQuadsChanged(e: CustomEvent) {
- 
-  const text = (editorElement.value as unknown as any)?.codeMirror?.value;
   const quads = e.detail.value as Quad[];
-  const rdfData: RdfData = {
+  // Defer by a microtask so @prefixes-parsed (dispatched synchronously right after
+  // @quads-changed by <rdf-editor>) updates prefixList before we emit 'change'.
+  queueMicrotask(() => {
+    const editor = editorElement.value as unknown as any;
+    const text = editor?.value || editor?.codeMirror?.value || rdfText.value;
+    const rdfData: RdfData = {
       quads: quads,
       rdfText: text,
       serializationFormat: props.format,
       prefix: prefixList.value
-  };
+    };
 
-  if (quads.length < MAX_TRIPLES_TO_BE_STORED) {
-    localStorage.setItem(localStorageKeyText, rdfData.rdfText);
-    localStorage.setItem(localStorageKeyFormat, rdfData.serializationFormat);
-    localStorage.setItem(localStorageKeyPrefixList, JSON.stringify(prefixList.value));
-  }
+    if (quads.length < MAX_TRIPLES_TO_BE_STORED) {
+      localStorage.setItem(localStorageKeyText, rdfData.rdfText);
+      localStorage.setItem(localStorageKeyFormat, rdfData.serializationFormat);
+      localStorage.setItem(localStorageKeyPrefixList, JSON.stringify(prefixList.value));
+    }
     emit('change', rdfData);
-  }
+  });
+}
  
 
 function onPrefixesParsed(e: CustomEvent) {
   for (const [prefix, val] of Object.entries(e.detail.prefixes)) {
-    const uri = val as string ;
-    prefixList.value.push({ prefix, uri });
-  }   
-}
-
-const customPrefixes = computed(() => {
-  const prefixMap: Record<string, string> = {};
-  prefixList.value.forEach((p) => {
-    if (typeof p.uri === 'string') {
-    prefixMap[p.prefix] = p.uri;
-  } else {
-    prefixMap[p.prefix] = (p.uri as unknown as any).value;
+    const uri = typeof val === 'string' ? val : (val as unknown as any)?.value;
+    if (!uri) continue;
+    const existing = prefixList.value.find(p => p.prefix === prefix);
+    if (existing) {
+      existing.uri = uri;
+    } else {
+      prefixList.value.push({ prefix, uri });
+    }
   }
-  });
-  prefixes.split(',').forEach((p) => {
-    delete prefixMap[p];
-  });
- 
-  return prefixMap;
-});
-
-const prefixes = "rdf,rdfs,sh";
+  syncCustomPrefixes();
+}
 
 onMounted(() => {
   // read previous state from local storage
@@ -104,7 +115,15 @@ onMounted(() => {
   const storedPrefixList = JSON.parse( localStorage.getItem(localStorageKeyPrefixList) ?? '[]');
   if (storedText && storedFormat && rdfFormats.find(f => f.type === storedFormat) && Array.isArray(storedPrefixList)) {
     rdfText.value = storedText;
-    prefixList.value = storedPrefixList;
+    const normalizedPrefixes: RdfPrefix[] = [];
+    for (const p of storedPrefixList) {
+      const uri = typeof p?.uri === 'string' ? p.uri : p?.uri?.value;
+      if (p?.prefix && uri && !normalizedPrefixes.some(existing => existing.prefix === p.prefix)) {
+        normalizedPrefixes.push({ prefix: p.prefix, uri });
+      }
+    }
+    prefixList.value = normalizedPrefixes;
+    syncCustomPrefixes();
 
     const format = rdfFormats.find(f => f.type === storedFormat);
     if(format) {

@@ -3,9 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 import rollupNodePolyFill from 'rollup-plugin-node-polyfills'
-import inject from '@rollup/plugin-inject';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -23,27 +21,35 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('../core-ui/src', import.meta.url)),
+            'node:stream': 'readable-stream',
             stream: 'readable-stream',
             util: 'util',
         }
     },
     optimizeDeps: {
-        esbuildOptions: {
+        rolldownOptions: {
             plugins: [
-                NodeGlobalsPolyfillPlugin({
-                    process: true,
-                    buffer: true,
-                }) as any,
+                rollupNodePolyFill() as any,
             ],
+            transform: {
+                inject: {
+                    process: 'process',
+                    Buffer: ['buffer', 'Buffer'],
+                },
+            },
         },
     },
     build: {
-        rollupOptions: {
-            plugins: [rollupNodePolyFill() as any,
-            inject({
-                process: 'process', // Inject process global
-                Buffer: ['buffer', 'Buffer'], // Inject Buffer global
-            }),],
+        rolldownOptions: {
+            plugins: [
+                rollupNodePolyFill() as any,
+            ],
+            transform: {
+                inject: {
+                    process: 'process', // Inject process global
+                    Buffer: ['buffer', 'Buffer'], // Inject Buffer global
+                },
+            },
             input: {
                 main: fileURLToPath(new URL('./vscode/index.html', import.meta.url))
             },
@@ -54,5 +60,6 @@ export default defineConfig({
             }
         },
         outDir: '../vscode-ext/media', // specify the target folder for the build
+        emptyOutDir: true,
     },
 })

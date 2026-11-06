@@ -1,27 +1,5 @@
 import { createApp } from 'vue';
 import type { ActivationFunction } from 'vscode-notebook-renderer';
-import PrimeVue from 'primevue/config';
-import { definePreset } from '@primeuix/themes';
-import Aura from '@primeuix/themes/aura';
-
-const VscodeBlue = definePreset(Aura, {
-    semantic: {
-        primary: {
-            50: '#f0f8ff',
-            100: '#e0f0fe',
-            200: '#bae2fd',
-            300: '#7dcbfb',
-            400: '#38b0f8',
-            500: '#007acc',
-            600: '#006bb3',
-            700: '#00558c',
-            800: '#004471',
-            900: '#00355a',
-            950: '#002542'
-        }
-    }
-});
-
 import AppVscode from '../vscode-webview/AppVscode.vue';
 
 // Make sure to import the CSS styles properly so they are bundled
@@ -47,9 +25,8 @@ export const activate: ActivationFunction = (_context) => {
             if (!iframeDoc) return;
 
             // 1) Copy stylesheets from parent document to iframe document 
-            // so PrimeVue and our components get styled correctly!
+            // so our components get styled correctly!
             const copyStyle = (el: Element) => {
-                // Avoid duplicating the exact same style node if it was already copied
                 if (!iframeDoc.head.querySelector(`style[data-vite-dev-id="${el.getAttribute('data-vite-dev-id')}"]`)) {
                     iframeDoc.head.appendChild(el.cloneNode(true));
                 }
@@ -58,8 +35,6 @@ export const activate: ActivationFunction = (_context) => {
             // Copy existing styles
             document.head.querySelectorAll('style, link[rel="stylesheet"]').forEach(copyStyle);
 
-            // PrimeVue 4 dynamically injects CSS at runtime (when Button, etc. are mounted).
-            // It uses the parent document.head, so we must observe and copy them as they appear!
             const headObserver = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     mutation.addedNodes.forEach((node) => {
@@ -97,51 +72,10 @@ export const activate: ActivationFunction = (_context) => {
             iframeDoc.body.style.margin = '0';
             iframeDoc.body.appendChild(container);
 
-            // Forward mouse events from iframe to parent document to fix PrimeVue Splitter resizing
-            iframeDoc.addEventListener('mousemove', (e) => {
-                const event = new MouseEvent('mousemove', {
-                    bubbles: true,
-                    cancelable: true,
-                    clientX: e.clientX,
-                    clientY: e.clientY,
-                    screenX: e.screenX,
-                    screenY: e.screenY
-                });
-                document.dispatchEvent(event);
-            });
-            iframeDoc.addEventListener('mouseup', (e) => {
-                const event = new MouseEvent('mouseup', {
-                    bubbles: true,
-                    cancelable: true,
-                    clientX: e.clientX,
-                    clientY: e.clientY,
-                    screenX: e.screenX,
-                    screenY: e.screenY
-                });
-                document.dispatchEvent(event);
-            });
-
             // 4) Mount Vue using props
             const app = createApp(AppVscode, {
                 rdfString: data.text(),
                 contentType: data.mime
-            });
-
-            app.use(PrimeVue, {
-                theme: {
-                    preset: VscodeBlue,
-                    options: {
-                        darkModeSelector: '.vscode-dark',
-                        cssLayer: false
-                    }
-                },
-                pt: {
-                    global: {
-                        css: `
-                            body { margin: 0; padding: 0; }
-                        `
-                    }
-                }
             });
 
             app.mount(container);

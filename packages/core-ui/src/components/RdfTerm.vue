@@ -2,15 +2,15 @@
 
   <div>
   <span v-if="props.term.termType === 'NamedNode'" :class="['term', { 'named-node': props.showArrow }]" @mousedown="avoidNodeDrag" :style="{ cursor: props.showArrow ? 'pointer' : 'default' }">
-    <span class="node-text">{{ displayValue }}</span><span class="arrow" style="color: #000" v-if="props.showArrow">&rarr;</span></span>
+    <span class="node-text">{{ displayValue }}</span><span class="arrow" v-if="props.showArrow">&rarr;</span></span>
   <span v-if="props.term.termType === 'BlankNode'" class="term blank-node" @mousedown="avoidNodeDrag" style="cursor: pointer;">
     <span class="node-text">[{{ displayValue }}]</span>
-    <span class="arrow" style="color: #000">&rarr;</span>
+    <span class="arrow">&rarr;</span>
   </span>
   <span v-if="props.term.termType === 'Literal'" class="term literal-container" @mousedown="avoidNodeDrag">
     <span class="literal">{{ displayValue }}</span>
-    <small v-if="language" style="color: grey">@{{ language }}</small>
-    <small class="data-type" v-else-if="dataType" style="color: grey">^^ {{ dataType }}</small>
+    <small v-if="language" style="color: var(--clr-p-600, #675945)">@{{ language }}</small>
+    <small class="data-type" v-else-if="dataType" style="color: var(--clr-p-600, #675945)">^^ {{ dataType }}</small>
   </span>
   </div>
 
@@ -75,26 +75,29 @@ function avoidNodeDrag(event: MouseEvent) {
 
 .arrow {
   opacity: 0;
-  margin-left: 4px;
-  transition: opacity 0.15s ease;
+  margin-left: 0.35em;
+  color: var(--clr-p-500, #A89271);
+  transition: opacity 0.15s ease, margin-left 0.2s ease;
   text-decoration: none;
   display: inline-block;
 }
 
 .named-node:hover .arrow {
   opacity: 1;
+  margin-left: 0.55em;
 }
 .named-node:hover .node-text {
   text-decoration: underline;
-  color: var(--p-primary-color, #007acc);
+  color: var(--sketch-primary, #A89271);
 }
 
 .blank-node:hover .arrow {
   opacity: 1;
+  margin-left: 0.55em;
 }
 .blank-node:hover .node-text {
   text-decoration: underline;
-  color: var(--p-primary-color, #007acc);
+  color: var(--sketch-primary, #A89271);
 }
 
 .data-type {

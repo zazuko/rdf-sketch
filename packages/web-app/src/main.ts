@@ -1,10 +1,6 @@
 import '@/assets/main.css'
 
 import { createApp } from 'vue';
-
-import PrimeVue from 'primevue/config';
-
-import Aura from '@primeuix/themes/aura';
 import App from './App.vue';
 
 import { useUrlSearchParams } from '@vueuse/core';
@@ -14,16 +10,6 @@ import { localStorageKeyFormat, localStorageKeyText } from '@/constant/local-sto
 const params = useUrlSearchParams('hash-params')
 
 const app = createApp(App);
-
-app.use(PrimeVue, {
-    theme: {
-        preset: Aura
-    },
-    options: {
-        darkModeSelector: '.my-app-dark',
-        cssLayer: false
-    }
-});
 
 writeRdfFromUrlToLocalStorage();
 

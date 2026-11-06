@@ -3,9 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 import rollupNodePolyFill from 'rollup-plugin-node-polyfills'
-import inject from '@rollup/plugin-inject';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 export default defineConfig({
@@ -19,18 +17,22 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('../core-ui/src', import.meta.url)),
+            'node:stream': 'readable-stream',
             stream: 'readable-stream',
             util: 'util',
         }
     },
     optimizeDeps: {
-        esbuildOptions: {
+        rolldownOptions: {
             plugins: [
-                NodeGlobalsPolyfillPlugin({
-                    process: true,
-                    buffer: true,
-                }) as any,
+                rollupNodePolyFill() as any,
             ],
+            transform: {
+                inject: {
+                    process: 'process',
+                    Buffer: ['buffer', 'Buffer'],
+                },
+            },
         },
     },
     build: {
@@ -40,14 +42,16 @@ export default defineConfig({
             formats: ['es'],
             fileName: () => 'renderer.js'
         },
-        rollupOptions: {
+        rolldownOptions: {
             plugins: [
                 rollupNodePolyFill() as any,
-                inject({
+            ],
+            transform: {
+                inject: {
                     process: 'process', // Inject process global
                     Buffer: ['buffer', 'Buffer'], // Inject Buffer global
-                })
-            ],
+                },
+            },
             external: ['vscode']
         },
         outDir: '../vscode-ext/dist',
