@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 
-import { computed, ref, watch, type PropType } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch, type PropType } from 'vue'
 
 import type { Resource } from '@/model/resource.model';
 import type { Dataset } from '@rdfjs/types';
@@ -68,17 +68,48 @@ const links = computed(() => {
 
 const nodes = ref<CustomNode[]>([])
 const edges = ref<CustomEdge[]>([])
-const isLoading = ref<boolean>(true)
+const isLoading = ref<boolean>(false)
 let hasLaidOut = false;
+let layoutRunId = 0;
+let layoutTimeout: ReturnType<typeof setTimeout> | null = null;
+let fallbackTimeout: ReturnType<typeof setTimeout> | null = null;
+let fitViewTimeout: ReturnType<typeof setTimeout> | null = null;
 
-watch(links, (newLinks) => {
-  if (newLinks.length === 0) {
-    isLoading.value = false;
-  } else {
-    isLoading.value = true;
+function clearLayoutTimers() {
+  if (layoutTimeout) {
+    clearTimeout(layoutTimeout);
+    layoutTimeout = null;
   }
+  if (fallbackTimeout) {
+    clearTimeout(fallbackTimeout);
+    fallbackTimeout = null;
+  }
+  if (fitViewTimeout) {
+    clearTimeout(fitViewTimeout);
+    fitViewTimeout = null;
+  }
+}
+
+onBeforeUnmount(() => {
+  clearLayoutTimers();
+});
+
+watch([resources, links], async ([newResources, newLinks]) => {
+  layoutRunId++;
+  const currentRunId = layoutRunId;
+  clearLayoutTimers();
+
+  if (newResources.length === 0) {
+    hasLaidOut = true;
+    nodes.value = [];
+    edges.value = [];
+    isLoading.value = false;
+    return;
+  }
+
+  isLoading.value = true;
   hasLaidOut = false; // allow layout to run again for new data
-  nodes.value = resources.value.map(resource => ({
+  nodes.value = newResources.map(resource => ({
     id: resource.id,
     type: 'custom',
     position: { x: 0, y: 0 },
@@ -96,40 +127,79 @@ watch(links, (newLinks) => {
     type: 'custom',
     markerEnd: MarkerType.ArrowClosed
   })) as CustomEdge[];
-},{ immediate: true });
+
+  await nextTick();
+  if (currentRunId !== layoutRunId) return;
+
+  // When existing node IDs are reused (e.g., changing RDF format or updating properties),
+  // Vue Flow keeps their previous dimensions so @nodes-initialized does not re-fire.
+  const allNodesMeasured = nodes.value.length > 0 && nodes.value.every(n => {
+    const internalNode = nodeLookup.value.get(n.id);
+    return (internalNode?.dimensions?.width ?? 0) > 0 && (internalNode?.dimensions?.height ?? 0) > 0;
+  });
+
+  if (allNodesMeasured) {
+    onNodesInitialized();
+  } else {
+    // Safety fallback in case ResizeObserver does not fire for any node
+    fallbackTimeout = setTimeout(() => {
+      if (currentRunId === layoutRunId && !hasLaidOut) {
+        onNodesInitialized();
+      }
+    }, 300);
+  }
+}, { immediate: true });
 
 async function onNodesInitialized() {
   // Guard: after the first layout, updating nodes.value causes Vue Flow to re-fire
   // this event. We only want to run the expensive ELK layout once per data change.
   if (hasLaidOut) return;
   hasLaidOut = true;
+  const currentRunId = layoutRunId;
+
+  clearLayoutTimers();
 
   // Wait a moment for Vue Flow to fully apply CSS and typography rendering to DOM 
   // so that node.dimensions gets accurately populated by the internal ResizeObserver.
-  setTimeout(async () => {
-    // Vue Flow stores actual DOM dimensions in its internal nodeLookup state!
-    // We must merge these dimensions into our node array before layout.
-    const nodesWithDimensions = nodes.value.map(n => {
-      const internalNode = nodeLookup.value.get(n.id)
-      return {
-        ...n,
-        dimensions: {
-          width: internalNode?.dimensions?.width || 500,
-          height: internalNode?.dimensions?.height || 200
+  layoutTimeout = setTimeout(async () => {
+    if (currentRunId !== layoutRunId) return;
+    try {
+      // Vue Flow stores actual DOM dimensions in its internal nodeLookup state!
+      // We must merge these dimensions into our node array before layout.
+      const nodesWithDimensions = nodes.value.map(n => {
+        const internalNode = nodeLookup.value.get(n.id)
+        return {
+          ...n,
+          dimensions: {
+            width: internalNode?.dimensions?.width || 500,
+            height: internalNode?.dimensions?.height || 200
+          }
         }
+      });
+
+      const nodesWithLayout = await elkLayout(nodesWithDimensions, edges.value);
+      if (currentRunId !== layoutRunId) return;
+
+      if (nodesWithLayout) {
+        nodes.value = (nodesWithLayout as any).nodes.map((n: CustomNode) => ({
+          ...n,
+          style: { opacity: 1 } // Show nodes once layout is applied
+        }));
+        edges.value = (nodesWithLayout as any).edges as CustomEdge[];
+      } else {
+        nodes.value = nodes.value.map((n: CustomNode) => ({
+          ...n,
+          style: { opacity: 1 }
+        }));
       }
-    });
+    } finally {
+      if (currentRunId === layoutRunId) {
+        isLoading.value = false;
+      }
+    }
 
-    const nodesWithLayout = await elkLayout(nodesWithDimensions, edges.value);
-    
-    nodes.value = (nodesWithLayout as any).nodes.map((n: CustomNode) => ({
-      ...n,
-      style: { opacity: 1 } // Show nodes once layout is applied
-    }));
-    edges.value = (nodesWithLayout as any).edges as CustomEdge[];
-  isLoading.value = false;
-
-    setTimeout(() => {
+    fitViewTimeout = setTimeout(() => {
+      if (currentRunId !== layoutRunId) return;
       fitView({ padding: 0.1, duration: 800 })
     }, 200);
   }, 50);
