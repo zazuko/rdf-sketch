@@ -6,7 +6,6 @@ import { Handle, Position, useVueFlow } from '@vue-flow/core'
 
 import RdfTerm from '../../RdfTerm.vue'
 import type { Term } from '@rdfjs/types';
-import { Avatar,AvatarGroup } from 'primevue';
 
 const { fitView, nodeLookup} = useVueFlow()
 
@@ -36,9 +35,16 @@ function zoomToNode(term: Term) {
 
       <header class="resource-card-header">
 
-        <AvatarGroup>
-            <Avatar v-for="(avatar, index) in props.data.resource.avatars" :key="index" :label="avatar.label" :style="{ backgroundColor: avatar.color, color: 'black', borderColor: 'rgba(0,0,0,0)', opacity: 0.8 }" size="large" shape="circle"/>
-        </AvatarGroup>
+        <div class="avatar-group">
+          <div
+            v-for="(avatar, index) in props.data.resource.avatars"
+            :key="index"
+            class="avatar-circle"
+            :style="{ backgroundColor: avatar.color }"
+          >
+            {{ avatar.label }}
+          </div>
+        </div>
         <div class="resource-title">
           <div>
           {{ props.data.resource.name }}
@@ -80,12 +86,20 @@ function zoomToNode(term: Term) {
 
 <style scoped>
 .resource-card {
-  border-radius: 5px;
-  background-color: white;
-  box-shadow: 0 4px 6px rgba(107, 107, 107, 0.8);
+  position: relative;
+  border-radius: 0.75rem;
+  background-color: var(--clr-n-0, #ffffff);
+  border: 1px solid var(--clr-p-500, #A89271);
+  box-shadow: 0 12px 28px -12px rgba(103, 89, 69, 0.35);
   min-width: 500px;
   width: max-content;
   max-width: max-content;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease;
+}
+
+.resource-card:hover {
+  box-shadow: 0 20px 40px -20px rgba(103, 89, 69, 0.55);
 }
 
 .resource-card-header {
@@ -93,15 +107,44 @@ function zoomToNode(term: Term) {
     align-items: center;
     justify-content: flex-start;
     gap: 1rem;
-    padding: 1rem;
-    background-color: gray;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    padding: 0.875rem 1.25rem;
+    background: radial-gradient(120% 140% at 15% 0%, #2d2419 0%, #1b1712 72%);
+    border-bottom: 2px solid var(--clr-p-500, #A89271);
 }
 
 .resource-title {
   display: flex;
   flex-direction: column;
+  color: #fff7e6;
+  font-family: var(--ff-secondary, sans-serif);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.avatar-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.avatar-circle {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-family: var(--ff-secondary, sans-serif);
+  font-weight: 600;
+  color: #1b1712;
+  border: 1.5px solid #1b1712;
+  box-shadow: 0 0 0 1px rgba(168, 146, 113, 0.5);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.avatar-circle + .avatar-circle {
+  margin-left: -0.75rem;
 }
 
 
@@ -114,9 +157,13 @@ function zoomToNode(term: Term) {
 .table-row {
   display: table-row;
   position: relative !important;
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid var(--clr-n-20, #E5E5E5);
   right: 0;
   top: 0;
+}
+
+.table-row:hover {
+  background-color: var(--clr-p-50, #FFFEF5);
 }
 
 .table-row:last-child {
@@ -124,26 +171,19 @@ function zoomToNode(term: Term) {
 }
 .predicate, .object {
   display: table-cell;
-  padding: 8px;
-  
+  padding: 12px 10px;
   text-align: left;
-  color: black;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  color: #1b1712;
+  vertical-align: top;
 }
 
 .predicate {
-  /* background-color: lightsalmon; */
-  padding-left: 16px;
-  text-align: left;
-  color: black;
-  padding-top: 16px;
-  padding-bottom: 16px;
-
+  padding-left: 18px;
+  font-weight: 500;
+  color: var(--clr-p-600, #675945);
 }
 .object {
-  /* background-color: lightsalmon; */
-  padding-right: 16px;
+  padding-right: 18px;
   text-align: left;
 }
 

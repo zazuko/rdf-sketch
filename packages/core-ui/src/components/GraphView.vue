@@ -256,8 +256,8 @@ function onNodeDrag(nodeDragEvent: NodeDragEvent) {
 }
 
 .loader {
-  border: 4px solid var(--vscode-dropdown-border, #f3f3f3);
-  border-top: 4px solid var(--vscode-button-background, #3498db);
+  border: 4px solid var(--vscode-dropdown-border, var(--clr-n-20, #E5E5E5));
+  border-top: 4px solid var(--vscode-button-background, var(--clr-p-500, #A89271));
   border-radius: 50%;
   width: 40px;
   height: 40px;

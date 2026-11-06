@@ -89,7 +89,7 @@ export function linksFromResources(resources: Resource[]): Link[] {
     return links
 }
 
-export const colorPalette = ["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78"];
+export const colorPalette = ["#A89271", "#E3D3B3", "#C5A880", "#8C7853", "#D4B895", "#9B8365", "#B59E7A", "#DFD3C3", "#7D6B52"];
 
 export function mapTypeToColor(typeIri: string): string {
     const typeHash = Array.from(typeIri).reduce((hash, char) => {

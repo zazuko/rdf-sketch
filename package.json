@@ -15,37 +15,31 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
-    "@primeuix/themes": "^2.0.3",
     "@rdfjs-elements/rdf-editor": "^0.5.11",
     "@vue-flow/core": "^1.48.2",
-    "@zazuko/env": "^3.0.1",
-    "@zazuko/prefixes": "^2.6.1",
+    "@zazuko/env": "^3.0.3",
+    "@zazuko/prefixes": "^2.6.4",
     "elkjs": "^0.11.1",
-    "primeicons": "^7.0.0",
-    "primevue": "^4.5.4",
     "util": "^0.12.5",
-    "vue": "^3.5.31"
+    "vue": "^3.5.45"
   },
   "devDependencies": {
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@rdfjs/types": "^2.0.1",
-    "@rollup/plugin-inject": "^5.0.5",
     "@rushstack/eslint-patch": "^1.16.1",
-    "@tsconfig/node20": "^20.1.9",
-    "@types/n3": "^1.26.1",
-    "@types/node": "^25.3.3",
-    "@vitejs/plugin-vue": "^6.0.5",
-    "@vue/eslint-config-typescript": "^14.7.0",
+    "@tsconfig/node20": "^20.1.10",
+    "@types/n3": "^1.26.6",
+    "@types/node": "^25.9.9",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/tsconfig": "^0.9.1",
-    "eslint": "^10.1.0",
-    "eslint-plugin-vue": "^10.8.0",
+    "eslint": "^10.14.0",
+    "eslint-plugin-vue": "^10.12.0",
     "npm-run-all2": "^8.0.4",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "typescript": "~5.9.3",
-    "vite": "^7.3.1",
-    "vite-plugin-css-injected-by-js": "^4.0.1",
-    "vite-plugin-pwa": "^1.2.0",
-    "vue-tsc": "^3.2.6"
+    "vite": "^8.3.6",
+    "vite-plugin-css-injected-by-js": "^5.0.3",
+    "vite-plugin-pwa": "^2.0.0",
+    "vue-tsc": "^3.3.14"
   }
 }
